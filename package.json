@@ -1,7 +1,7 @@
 {
-  "name": "paypal-druid-plugin",
-  "version": "4.0.0",
-  "description": "Grafana plugin for Druid real-time OLAP database",
+  "name": "grafana-druid-plugin",
+  "version": "0.1.0",
+  "description": "Grafana plugin for Druid",
   "main": "index.js",
   "scripts": {
     "build": "grunt",
@@ -9,12 +9,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/grafana-druid-plugin/druidplugin.git"
+    "url": "git+https://github.com/liquidm/druidplugin.git"
   },
   "keywords": [
     "Druid"
   ],
-  "author": "Abhishek Sant",
+  "author": "LQM",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/grafana-druid-plugin/druidplugin/issues"
@@ -42,5 +42,5 @@
     "systemjs-plugin-css": "^0.1.35",
     "typescript": "^3.0.3"
   },
-  "homepage": "https://github.com/grafana-druid-plugin/druidplugin#readme"
+  "homepage": "https://github.com/liquidm/druidplugin/blob/master/README.md"
 }

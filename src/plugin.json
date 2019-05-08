@@ -1,18 +1,18 @@
 {
   "type": "datasource",
   "name": "Druid",
-  "id": "paypal-druid-datasource",
+  "id": "grafana-druid-datasource",
 
   "metrics": true,
 
   "info": {
-    "version": "0.0.6",
+    "version": "0.1.0",
     "author": {
-      "name": "Abhishek Sant",
-      "url": "https://github.com/grafana-druid-plugin/druidplugin"
+      "name": "LQM",
+      "url": "https://github.com/liquidm/druidplugin"
     },
    "links":[
-     {"name": "GitHub", "url": "https://github.com/grafana-druid-plugin/druidplugin"}
+     {"name": "GitHub", "url": "https://github.com/liquidm/druidplugin"}
     ],
    "logos": {
       "small": "img/druid_logo.png",
