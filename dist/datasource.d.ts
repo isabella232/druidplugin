@@ -31,6 +31,7 @@ export default class DruidDatasource {
         "limit": any;
         "columns": any;
     };
+    metricFindQuery(query: any): any;
     testDatasource(): any;
     getDataSources(): any;
     getDimensionsAndMetrics(datasource: any): any;

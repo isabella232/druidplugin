@@ -27,4 +27,3 @@ System.register(["./datasource", "./query_ctrl", "./config_ctrl"], function (exp
         }
     };
 });
-//# sourceMappingURL=module.js.map

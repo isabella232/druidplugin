@@ -1,6 +1,6 @@
-System.register(["lodash", "moment", "app/core/utils/datemath"], function (exports_1, context_1) {
+System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], function (exports_1, context_1) {
     "use strict";
-    var lodash_1, moment_1, dateMath, DRUID_DATASOURCE_PATH, DruidDatasource;
+    var lodash_1, moment_1, dateMath, angular_1, DRUID_DATASOURCE_PATH, DruidDatasource;
     var __moduleName = context_1 && context_1.id;
     return {
         setters: [
@@ -12,6 +12,9 @@ System.register(["lodash", "moment", "app/core/utils/datemath"], function (expor
             },
             function (dateMath_1) {
                 dateMath = dateMath_1;
+            },
+            function (angular_1_1) {
+                angular_1 = angular_1_1;
             }
         ],
         execute: function () {
@@ -218,6 +221,17 @@ System.register(["lodash", "moment", "app/core/utils/datemath"], function (expor
                             return { "dimension": col, "direction": "DESCENDING" };
                         })
                     };
+                };
+                DruidDatasource.prototype.metricFindQuery = function (query) {
+                    var range = angular_1.default.element('grafana-app').injector().get('timeSrv').timeRangeForUrl(), from = this.dateToMoment(range.from, false), to = this.dateToMoment(range.to, true), intervals = this.getQueryIntervals(from, to);
+                    var q = JSON.parse(query);
+                    q.intervals = intervals;
+                    return this.druidQuery(q)
+                        .then(function (response) {
+                        return lodash_1.default.map(response.data[0].result, function (e) {
+                            return { "text": e[q.dimension] };
+                        });
+                    });
                 };
                 DruidDatasource.prototype.testDatasource = function () {
                     return this.get(DRUID_DATASOURCE_PATH).then(function () {
@@ -459,4 +473,3 @@ System.register(["lodash", "moment", "app/core/utils/datemath"], function (expor
         }
     };
 });
-//# sourceMappingURL=datasource.js.map

@@ -55,6 +55,7 @@ System.register(["lodash", "app/plugins/sdk", "./css/query_editor.css!"], functi
                         "arithmetic": _this.validateArithmeticPostAggregator.bind(_this),
                         "max": _this.validateMaxPostAggregator.bind(_this),
                         "min": _this.validateMinPostAggregator.bind(_this),
+                        "constant": _this.validateConstantPostAggregator.bind(_this),
                         "quantile": _this.validateQuantilePostAggregator.bind(_this)
                     };
                     _this.arithmeticPostAggregatorFns = { '+': null, '-': null, '*': null, '/': null };
@@ -445,6 +446,12 @@ System.register(["lodash", "app/plugins/sdk", "./css/query_editor.css!"], functi
                     }
                     return null;
                 };
+                DruidQueryCtrl.prototype.validateConstantPostAggregator = function (target) {
+                    if (!target.currentPostAggregator.value) {
+                        return "Must provide an a value for constant post aggregator.";
+                    }
+                    return null;
+                };
                 DruidQueryCtrl.prototype.validateQuantilePostAggregator = function (target) {
                     var err = this.validateSimplePostAggregator('quantile', target);
                     if (err) {
@@ -553,4 +560,3 @@ System.register(["lodash", "app/plugins/sdk", "./css/query_editor.css!"], functi
         }
     };
 });
-//# sourceMappingURL=query_ctrl.js.map

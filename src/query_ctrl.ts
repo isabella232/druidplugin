@@ -52,6 +52,7 @@ export class DruidQueryCtrl extends QueryCtrl {
     "arithmetic": this.validateArithmeticPostAggregator.bind(this),
     "max": this.validateMaxPostAggregator.bind(this),
     "min": this.validateMinPostAggregator.bind(this),
+    "constant": this.validateConstantPostAggregator.bind(this),
     "quantile": this.validateQuantilePostAggregator.bind(this)
   };
 
@@ -511,6 +512,13 @@ export class DruidQueryCtrl extends QueryCtrl {
   validateMinPostAggregator(target) {
     const err = this.validateSimplePostAggregator('min', target);
     if (err) { return err; }
+    return null;
+  }
+
+  validateConstantPostAggregator(target) {
+    if (!target.currentPostAggregator.value) {
+      return "Must provide an a value for constant post aggregator.";
+    }
     return null;
   }
 

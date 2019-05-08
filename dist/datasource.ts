@@ -4,6 +4,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import * as dateMath from 'app/core/utils/datemath';
 import * as Druid from 'druid.d'
+import angular from "angular";
 
 const DRUID_DATASOURCE_PATH = '/druid/v2/datasources';
 
@@ -259,6 +260,23 @@ export default class DruidDatasource {
         return { "dimension": col, "direction": "DESCENDING" };
       })
     };
+  }
+
+  metricFindQuery(query) {
+    var range = angular.element('grafana-app').injector().get('timeSrv').timeRangeForUrl(),
+      from = this.dateToMoment(range.from, false),
+      to = this.dateToMoment(range.to, true),
+      intervals = this.getQueryIntervals(from, to);
+
+    var q = JSON.parse(query);
+    q.intervals = intervals;
+
+    return this.druidQuery(q)
+      .then(response => {
+        return _.map(response.data[0].result, (e) => {
+          return { "text": e[q.dimension] };
+        });
+      });
   }
 
   testDatasource() {
