@@ -53,7 +53,9 @@ export class DruidQueryCtrl extends QueryCtrl {
     "max": this.validateMaxPostAggregator.bind(this),
     "min": this.validateMinPostAggregator.bind(this),
     "constant": this.validateConstantPostAggregator.bind(this),
-    "quantile": this.validateQuantilePostAggregator.bind(this)
+    "fieldAccess": this.validateFieldAccessPostAggregator.bind(this),
+    "quantile": this.validateQuantilePostAggregator.bind(this),
+    "javascript": this.validateJavascriptPostAggregator.bind(this)
   };
 
   arithmeticPostAggregatorFns = { '+': null, '-': null, '*': null, '/': null };
@@ -517,8 +519,14 @@ export class DruidQueryCtrl extends QueryCtrl {
 
   validateConstantPostAggregator(target) {
     if (!target.currentPostAggregator.value) {
-      return "Must provide an a value for constant post aggregator.";
+      return "Must provide a value for constant post aggregator.";
     }
+    return null;
+  }
+
+  validateFieldAccessPostAggregator(target) {
+    const err = this.validateSimplePostAggregator('fieldAccess', target);
+    if (err) { return err; }
     return null;
   }
 
@@ -527,6 +535,19 @@ export class DruidQueryCtrl extends QueryCtrl {
     if (err) { return err; }
     if (!target.currentPostAggregator.probability) {
       return "Must provide a probability for the quantile post aggregator.";
+    }
+    return null;
+  }
+
+  validateJavascriptPostAggregator(target) {
+    if (!target.currentPostAggregator.name) {
+      return "Must provide a name for javascript post aggregator.";
+    }
+    if (!target.currentPostAggregator.fieldNames) {
+      return "Must provide field names for javascript post aggregator.";
+    }
+    if (!target.currentPostAggregator.function) {
+      return "Must provide a function for javascript post aggregator.";
     }
     return null;
   }

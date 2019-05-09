@@ -20,7 +20,7 @@ export default class DruidDatasource {
     constructor(instanceSettings: any, $q: any, backendSrv: any, templateSrv: any);
     query(options: any): any;
     doQuery(from: any, to: any, granularity: any, target: any): any;
-    splitCardinalityFields(aggregator: any): any;
+    splitArrayFields(aggregator: any): any;
     selectQuery(datasource: string, intervals: Array<string>, granularity: Druid.Granularity, dimensions: Array<string | Object>, metric: Array<string | Object>, filters: Array<Druid.DruidFilter>, selectThreshold: Object): any;
     timeSeriesQuery(datasource: string, intervals: Array<string>, granularity: Druid.Granularity, filters: Array<Druid.DruidFilter>, aggregators: Object, postAggregators: Object): any;
     topNQuery(datasource: string, intervals: Array<string>, granularity: Druid.Granularity, filters: Array<Druid.DruidFilter>, aggregators: Object, postAggregators: Object, threshold: number, metric: string | Object, dimension: string | Object): any;

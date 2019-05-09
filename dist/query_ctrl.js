@@ -56,7 +56,9 @@ System.register(["lodash", "app/plugins/sdk", "./css/query_editor.css!"], functi
                         "max": _this.validateMaxPostAggregator.bind(_this),
                         "min": _this.validateMinPostAggregator.bind(_this),
                         "constant": _this.validateConstantPostAggregator.bind(_this),
-                        "quantile": _this.validateQuantilePostAggregator.bind(_this)
+                        "fieldAccess": _this.validateFieldAccessPostAggregator.bind(_this),
+                        "quantile": _this.validateQuantilePostAggregator.bind(_this),
+                        "javascript": _this.validateJavascriptPostAggregator.bind(_this)
                     };
                     _this.arithmeticPostAggregatorFns = { '+': null, '-': null, '*': null, '/': null };
                     _this.defaultQueryType = "timeseries";
@@ -448,7 +450,14 @@ System.register(["lodash", "app/plugins/sdk", "./css/query_editor.css!"], functi
                 };
                 DruidQueryCtrl.prototype.validateConstantPostAggregator = function (target) {
                     if (!target.currentPostAggregator.value) {
-                        return "Must provide an a value for constant post aggregator.";
+                        return "Must provide a value for constant post aggregator.";
+                    }
+                    return null;
+                };
+                DruidQueryCtrl.prototype.validateFieldAccessPostAggregator = function (target) {
+                    var err = this.validateSimplePostAggregator('fieldAccess', target);
+                    if (err) {
+                        return err;
                     }
                     return null;
                 };
@@ -459,6 +468,18 @@ System.register(["lodash", "app/plugins/sdk", "./css/query_editor.css!"], functi
                     }
                     if (!target.currentPostAggregator.probability) {
                         return "Must provide a probability for the quantile post aggregator.";
+                    }
+                    return null;
+                };
+                DruidQueryCtrl.prototype.validateJavascriptPostAggregator = function (target) {
+                    if (!target.currentPostAggregator.name) {
+                        return "Must provide a name for javascript post aggregator.";
+                    }
+                    if (!target.currentPostAggregator.fieldNames) {
+                        return "Must provide field names for javascript post aggregator.";
+                    }
+                    if (!target.currentPostAggregator.function) {
+                        return "Must provide a function for javascript post aggregator.";
                     }
                     return null;
                 };
@@ -560,3 +581,4 @@ System.register(["lodash", "app/plugins/sdk", "./css/query_editor.css!"], functi
         }
     };
 });
+//# sourceMappingURL=query_ctrl.js.map

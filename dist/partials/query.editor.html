@@ -404,7 +404,7 @@
       <div class="gf-form-label gf-form-label--grow"></div>
     </div>
   </div>
-  <div class="gf-form-inline">
+  <div class="gf-form">
   <div class="gf-form">
     <label class="gf-form-label query-keyword width-9">
       Post Aggs
@@ -439,7 +439,15 @@
       </div>
       <div ng-switch-when="constant">
         <label class="gf-form-label">
-          {{postAggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{postAggregator.name}},&nbsp;=&nbsp;{{postAggregator.value}}
+          {{postAggregator.type}}:&nbsp;{{postAggregator.name}}&nbsp;=&nbsp;{{postAggregator.value}}
+          <a ng-click="ctrl.removePostAggregator($index)">
+            <i class="fa fa-remove"></i>
+          </a>
+        </label>
+      </div>
+      <div ng-switch-when="fieldAccess">
+        <label class="gf-form-label">
+          {{postAggregator.type}}:&nbsp;{{postAggregator.name}}&nbsp;=&nbsp;{{postAggregator.fieldName}}
           <a ng-click="ctrl.removePostAggregator($index)">
             <i class="fa fa-remove"></i>
           </a>
@@ -448,6 +456,14 @@
       <div ng-switch-when="quantile">
         <label class="gf-form-label">
           {{postAggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{postAggregator.name}},&nbsp;field&nbsp;=&nbsp;{{postAggregator.fieldName}}, &nbsp;prob&nbsp;=&nbsp;{{postAggregator.probability}}
+          <a ng-click="ctrl.removePostAggregator($index)">
+            <i class="fa fa-remove"></i>
+          </a>
+        </label>
+      </div>
+      <div ng-switch-when="javascript">
+        <label class="gf-form-label">
+          {{postAggregator.type}}:&nbsp;{{postAggregator.name}}&nbsp;=&nbsp;{{postAggregator.function}}
           <a ng-click="ctrl.removePostAggregator($index)">
             <i class="fa fa-remove"></i>
           </a>
@@ -490,11 +506,24 @@
     <input type="text" ng-switch-when="constant" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.value" placeholder="value" ng-blur="ctrl.targetBlur()">
   </div>
 
+  <!-- fieldAccess -->
+  <div class="gf-form" ng-show="ctrl.addPostAggregatorMode" ng-switch on="ctrl.target.currentPostAggregator.type">
+    <input type="text" ng-switch-when="fieldAccess" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.name" placeholder="output name" ng-blur="ctrl.targetBlur()">
+    <input type="text" ng-switch-when="fieldAccess" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.fieldName" placeholder="field name" ng-blur="ctrl.targetBlur()">
+  </div>
+
   <!-- quantile -->
   <div class="gf-form" ng-show="ctrl.addPostAggregatorMode" ng-switch on="ctrl.target.currentPostAggregator.type">
     <input type="text" ng-switch-when="quantile" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.name" placeholder="output name" ng-blur="ctrl.targetBlur()">
     <input type="text" ng-switch-when="quantile" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.fieldName" placeholder="agg name" ng-blur="ctrl.targetBlur()">
     <input type="text" ng-switch-when="quantile" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.probability" placeholder="probability" ng-blur="ctrl.targetBlur()">
+  </div>
+
+  <!-- javascript -->
+  <div class="gf-form-inline" ng-show="ctrl.addPostAggregatorMode" ng-switch on="ctrl.target.currentPostAggregator.type">
+    <input type="text" ng-switch-when="javascript" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.name" placeholder="output name" ng-blur="ctrl.targetBlur()" style="width:50%;">
+    <input type="text" ng-switch-when="javascript" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.fieldNames" placeholder="field1,field2" ng-blur="ctrl.targetBlur()" style="width:49%;">
+    <textarea type="text" ng-switch-when="javascript" class="input gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.function" placeholder="function(field) {return value;}" ng-blur="ctrl.targetBlur()"></textarea>
   </div>
 
   <div class="gf-form" ng-show="ctrl.addPostAggregatorMode">

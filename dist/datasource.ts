@@ -85,8 +85,8 @@ export default class DruidDatasource {
   doQuery(from, to, granularity, target) {
     let datasource = target.druidDS;
     let filters = target.filters;
-    let aggregators = target.aggregators.map(this.splitCardinalityFields);
-    let postAggregators = target.postAggregators;
+    let aggregators = target.aggregators.map(this.splitArrayFields);
+    let postAggregators = target.postAggregators.map(this.splitArrayFields);
     let groupBy = _.map(target.groupBy, (e) => { return this.templateSrv.replace(e) });
     let limitSpec = null;
     let metricNames = this.getMetricNames(aggregators, postAggregators);
@@ -155,8 +155,9 @@ export default class DruidDatasource {
     });
   };
 
-  splitCardinalityFields(aggregator) {
-    if (aggregator.type === 'cardinality' && typeof aggregator.fieldNames === 'string') {
+  splitArrayFields(aggregator) {
+    if ((aggregator.type === 'cardinality' || aggregator.type === 'javascript') &&
+      typeof aggregator.fieldNames === 'string') {
       aggregator.fieldNames = aggregator.fieldNames.split(',')
     }
     return aggregator;

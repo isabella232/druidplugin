@@ -80,8 +80,8 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     var _this = this;
                     var datasource = target.druidDS;
                     var filters = target.filters;
-                    var aggregators = target.aggregators.map(this.splitCardinalityFields);
-                    var postAggregators = target.postAggregators;
+                    var aggregators = target.aggregators.map(this.splitArrayFields);
+                    var postAggregators = target.postAggregators.map(this.splitArrayFields);
                     var groupBy = lodash_1.default.map(target.groupBy, function (e) { return _this.templateSrv.replace(e); });
                     var limitSpec = null;
                     var metricNames = this.getMetricNames(aggregators, postAggregators);
@@ -132,8 +132,9 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     });
                 };
                 ;
-                DruidDatasource.prototype.splitCardinalityFields = function (aggregator) {
-                    if (aggregator.type === 'cardinality' && typeof aggregator.fieldNames === 'string') {
+                DruidDatasource.prototype.splitArrayFields = function (aggregator) {
+                    if ((aggregator.type === 'cardinality' || aggregator.type === 'javascript') &&
+                        typeof aggregator.fieldNames === 'string') {
                         aggregator.fieldNames = aggregator.fieldNames.split(',');
                     }
                     return aggregator;
@@ -473,3 +474,4 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
         }
     };
 });
+//# sourceMappingURL=datasource.js.map

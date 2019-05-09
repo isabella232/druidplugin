@@ -48,7 +48,9 @@ export declare class DruidQueryCtrl extends QueryCtrl {
         "max": any;
         "min": any;
         "constant": any;
+        "fieldAccess": any;
         "quantile": any;
+        "javascript": any;
     };
     arithmeticPostAggregatorFns: {
         '+': any;
@@ -111,7 +113,9 @@ export declare class DruidQueryCtrl extends QueryCtrl {
     validateMaxPostAggregator(target: any): string;
     validateMinPostAggregator(target: any): string;
     validateConstantPostAggregator(target: any): string;
+    validateFieldAccessPostAggregator(target: any): string;
     validateQuantilePostAggregator(target: any): string;
+    validateJavascriptPostAggregator(target: any): "Must provide a name for javascript post aggregator." | "Must provide field names for javascript post aggregator." | "Must provide a function for javascript post aggregator.";
     validateArithmeticPostAggregator(target: any): "Must provide an output name for arithmetic post aggregator." | "Must provide a function for arithmetic post aggregator." | "Invalid arithmetic function" | "Must provide a list of fields for arithmetic post aggregator." | "Must provide at least two fields for arithmetic post aggregator.";
     validateTarget(): any;
 }
