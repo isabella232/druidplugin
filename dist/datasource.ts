@@ -74,7 +74,17 @@ export default class DruidDatasource {
           granularity = { "type": "period", "period": "P1D", "timeZone": this.periodGranularity }
         }
       }
-      return this.doQuery(roundedFrom, to, granularity, target);
+      return this.doQuery(roundedFrom, to, granularity, target)
+        .then(response => {
+          target.postAggregators
+            .filter(a => a.type === 'fieldAccess' && a.extMultiplier)
+            .forEach(a => {
+              response.filter(r => r.target === a.name)
+                .flatMap(r => r.datapoints)
+                .forEach(dp => dp[0] = dp[0] * a.extMultiplier)
+            });
+          return response;
+        });
     });
 
     return this.q.all(promises).then(results => {

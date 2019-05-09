@@ -70,7 +70,17 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                                 granularity = { "type": "period", "period": "P1D", "timeZone": _this.periodGranularity };
                             }
                         }
-                        return _this.doQuery(roundedFrom, to, granularity, target);
+                        return _this.doQuery(roundedFrom, to, granularity, target)
+                            .then(function (response) {
+                            target.postAggregators
+                                .filter(function (a) { return a.type === 'fieldAccess' && a.extMultiplier; })
+                                .forEach(function (a) {
+                                response.filter(function (r) { return r.target === a.name; })
+                                    .flatMap(function (r) { return r.datapoints; })
+                                    .forEach(function (dp) { return dp[0] = dp[0] * a.extMultiplier; });
+                            });
+                            return response;
+                        });
                     });
                     return this.q.all(promises).then(function (results) {
                         return { data: lodash_1.default.flatten(results) };

@@ -447,7 +447,7 @@
       </div>
       <div ng-switch-when="fieldAccess">
         <label class="gf-form-label">
-          {{postAggregator.type}}:&nbsp;{{postAggregator.name}}&nbsp;=&nbsp;{{postAggregator.fieldName}}
+          {{postAggregator.type}}:&nbsp;{{postAggregator.name}}&nbsp;=&nbsp;{{postAggregator.fieldName}}&nbsp;*&nbsp;{{postAggregator.extMultiplier}}
           <a ng-click="ctrl.removePostAggregator($index)">
             <i class="fa fa-remove"></i>
           </a>
@@ -510,6 +510,7 @@
   <div class="gf-form" ng-show="ctrl.addPostAggregatorMode" ng-switch on="ctrl.target.currentPostAggregator.type">
     <input type="text" ng-switch-when="fieldAccess" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.name" placeholder="output name" ng-blur="ctrl.targetBlur()">
     <input type="text" ng-switch-when="fieldAccess" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.fieldName" placeholder="field name" ng-blur="ctrl.targetBlur()">
+    <input type="text" ng-switch-when="fieldAccess" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.extMultiplier" placeholder="multiplier" ng-blur="ctrl.targetBlur()">
   </div>
 
   <!-- quantile -->
