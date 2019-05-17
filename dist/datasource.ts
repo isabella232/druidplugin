@@ -76,7 +76,7 @@ export default class DruidDatasource {
       }
       return this.doQuery(roundedFrom, to, granularity, target)
         .then(response => {
-          target.postAggregators
+          if (target.postAggregators) target.postAggregators
             .filter(a => a.type === 'fieldAccess' && a.extMultiplier)
             .forEach(a => {
               response.filter(r => r.target === a.name)
@@ -96,7 +96,7 @@ export default class DruidDatasource {
     let datasource = target.druidDS;
     let filters = target.filters;
     let aggregators = target.aggregators.map(this.splitArrayFields);
-    let postAggregators = target.postAggregators.map(this.splitArrayFields);
+    let postAggregators = target.postAggregators ? target.postAggregators.map(this.splitArrayFields) : [];
     let groupBy = _.map(target.groupBy, (e) => { return this.templateSrv.replace(e) });
     let limitSpec = null;
     let metricNames = this.getMetricNames(aggregators, postAggregators);

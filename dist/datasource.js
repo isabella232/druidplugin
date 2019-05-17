@@ -72,13 +72,14 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         }
                         return _this.doQuery(roundedFrom, to, granularity, target)
                             .then(function (response) {
-                            target.postAggregators
-                                .filter(function (a) { return a.type === 'fieldAccess' && a.extMultiplier; })
-                                .forEach(function (a) {
-                                response.filter(function (r) { return r.target === a.name; })
-                                    .flatMap(function (r) { return r.datapoints; })
-                                    .forEach(function (dp) { return dp[0] = dp[0] * a.extMultiplier; });
-                            });
+                            if (target.postAggregators)
+                                target.postAggregators
+                                    .filter(function (a) { return a.type === 'fieldAccess' && a.extMultiplier; })
+                                    .forEach(function (a) {
+                                    response.filter(function (r) { return r.target === a.name; })
+                                        .flatMap(function (r) { return r.datapoints; })
+                                        .forEach(function (dp) { return dp[0] = dp[0] * a.extMultiplier; });
+                                });
                             return response;
                         });
                     });
@@ -91,7 +92,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     var datasource = target.druidDS;
                     var filters = target.filters;
                     var aggregators = target.aggregators.map(this.splitArrayFields);
-                    var postAggregators = target.postAggregators.map(this.splitArrayFields);
+                    var postAggregators = target.postAggregators ? target.postAggregators.map(this.splitArrayFields) : [];
                     var groupBy = lodash_1.default.map(target.groupBy, function (e) { return _this.templateSrv.replace(e); });
                     var limitSpec = null;
                     var metricNames = this.getMetricNames(aggregators, postAggregators);
