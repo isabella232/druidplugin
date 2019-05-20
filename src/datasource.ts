@@ -279,7 +279,7 @@ export default class DruidDatasource {
       to = this.dateToMoment(range.to, true),
       intervals = this.getQueryIntervals(from, to);
 
-    var q = JSON.parse(query);
+    var q = JSON.parse(this.templateSrv.replace(query));
     q.intervals = intervals;
 
     return this.druidQuery(q)
@@ -304,7 +304,7 @@ export default class DruidDatasource {
   };
 
   getDimensionsAndMetrics(datasource) {
-    return this.get(DRUID_DATASOURCE_PATH + datasource).then(response => {
+    return this.get(DRUID_DATASOURCE_PATH + '/' + datasource).then(response => {
       return response.data;
     });
   };

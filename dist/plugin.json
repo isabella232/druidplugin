@@ -1,12 +1,12 @@
 {
   "type": "datasource",
-  "name": "Druid",
+  "name": "Druid datasource",
   "id": "grafana-druid-datasource",
 
   "metrics": true,
 
   "info": {
-    "version": "0.1.0",
+    "version": "0.1.1",
     "author": {
       "name": "LQM",
       "url": "https://github.com/liquidm/druidplugin"
