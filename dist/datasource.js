@@ -63,7 +63,9 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         var maxDataPointsByResolution = options.maxDataPoints;
                         var maxDataPointsByConfig = target.maxDataPoints ? target.maxDataPoints : Number.MAX_VALUE;
                         var maxDataPoints = Math.min(maxDataPointsByResolution, maxDataPointsByConfig);
-                        var granularity = target.shouldOverrideGranularity ? _this.templateSrv.replace(target.customGranularity) : _this.computeGranularity(from, to, maxDataPoints);
+                        var customGranularity = _this.templateSrv.replace(target.customGranularity);
+                        var shouldOverrideGranularity = target.shouldOverrideGranularity && (customGranularity !== 'auto');
+                        var granularity = shouldOverrideGranularity ? customGranularity : _this.computeGranularity(from, to, maxDataPoints);
                         var roundedFrom = granularity === "all" ? from : _this.roundUpStartTime(from, granularity);
                         if (_this.periodGranularity != "") {
                             if (granularity === 'day') {

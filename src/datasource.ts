@@ -65,7 +65,9 @@ export default class DruidDatasource {
       const maxDataPointsByResolution = options.maxDataPoints;
       const maxDataPointsByConfig = target.maxDataPoints ? target.maxDataPoints : Number.MAX_VALUE;
       const maxDataPoints = Math.min(maxDataPointsByResolution, maxDataPointsByConfig);
-      let granularity = target.shouldOverrideGranularity ? this.templateSrv.replace(target.customGranularity) : this.computeGranularity(from, to, maxDataPoints);
+      let customGranularity = this.templateSrv.replace(target.customGranularity);
+      let shouldOverrideGranularity = target.shouldOverrideGranularity && (customGranularity !== 'auto');
+      let granularity = shouldOverrideGranularity ? customGranularity : this.computeGranularity(from, to, maxDataPoints);
       //Round up to start of an interval
       //Width of bar chars in Grafana is determined by size of the smallest interval
       const roundedFrom = granularity === "all" ? from : this.roundUpStartTime(from, granularity);
