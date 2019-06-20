@@ -305,6 +305,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     var replacedFilters = filters.map(function (filter) {
                         return _this.replaceTemplateValues(filter, _this.filterTemplateExpanders[filter.type]);
                     })
+                        .filter(function (f) { return f[_this.filterTemplateExpanders[f.type]]; })
                         .map(function (filter) {
                         var finalFilter = lodash_1.default.omit(filter, 'negate');
                         if (filter.negate) {

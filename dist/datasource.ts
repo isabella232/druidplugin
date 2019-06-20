@@ -354,6 +354,7 @@ export default class DruidDatasource {
     const replacedFilters = filters.map(filter => {
       return this.replaceTemplateValues(filter, this.filterTemplateExpanders[filter.type]);
     })
+      .filter(f => f[this.filterTemplateExpanders[f.type]])
       .map(filter => {
         const finalFilter = _.omit(filter, 'negate');
         if (filter.negate) {
