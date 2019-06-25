@@ -332,7 +332,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         }
                         return finalFilter;
                     });
-                    if (replacedFilters) {
+                    if (replacedFilters && replacedFilters.length > 0) {
                         if (replacedFilters.length === 1) {
                             return replacedFilters[0];
                         }

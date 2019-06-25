@@ -380,7 +380,7 @@ export default class DruidDatasource {
         }
         return finalFilter;
       });
-    if (replacedFilters) {
+    if (replacedFilters && replacedFilters.length > 0) {
       if (replacedFilters.length === 1) {
         return replacedFilters[0];
       }
