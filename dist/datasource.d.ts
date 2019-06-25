@@ -13,6 +13,7 @@ export default class DruidDatasource {
     GRANULARITIES: any[][];
     filterTemplateExpanders: {
         "selector": string[];
+        "array": string[];
         "regex": string[];
         "javascript": string[];
         "search": any[];

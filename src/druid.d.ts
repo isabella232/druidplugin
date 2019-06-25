@@ -80,6 +80,12 @@ export interface DruidFilterSelect {
   value: string;
 }
 
+export interface DruidFilterArray {
+  type: 'array';
+  dimension: string;
+  value: string;
+}
+
 export interface DruidFilterIn {
   type: string;
   dimension: string;
@@ -92,4 +98,4 @@ export interface DruidFilterRegex {
   pattern: string;
 }
 
-export type DruidFilter = DruidFilterLogical | DruidFilterSelect | DruidFilterRegex | DruidFilterIn | DruidFilterNot;
+export type DruidFilter = DruidFilterLogical | DruidFilterSelect | DruidFilterArray | DruidFilterRegex | DruidFilterIn | DruidFilterNot;

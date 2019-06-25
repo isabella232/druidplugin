@@ -31,6 +31,7 @@ export declare class DruidQueryCtrl extends QueryCtrl {
     };
     filterValidators: {
         "selector": any;
+        "array": any;
         "regex": any;
         "javascript": any;
     };

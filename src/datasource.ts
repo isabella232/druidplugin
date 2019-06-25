@@ -32,6 +32,7 @@ export default class DruidDatasource {
   ];
   filterTemplateExpanders = {
     "selector": ['value'],
+    "array": ['value'],
     "regex": ['pattern'],
     "javascript": ['function'],
     "search": []
@@ -351,14 +352,31 @@ export default class DruidDatasource {
 
   buildFilterTree(filters): Druid.DruidFilter {
     //Do template variable replacement
-    const replacedFilters = filters.map(filter => {
-      return this.replaceTemplateValues(filter, this.filterTemplateExpanders[filter.type]);
-    })
+    const replacedFilters = filters
+      .map(filter => {
+        return this.replaceTemplateValues(filter, this.filterTemplateExpanders[filter.type]);
+      })
       .filter(f => f[this.filterTemplateExpanders[f.type]])
+      .map(f => {
+        if (f.type !== 'array') return f;
+        let negate = f.value.startsWith('!') || f.negate;
+        if (f.value.startsWith('!')) f.value = f.value.substr(1);
+        return {
+          'type': 'or',
+          'negate': negate,
+          'fields':
+              f.value.split(',').map(value => {
+                let copy = _.omit(f, 'negate');
+                copy.value = value.startsWith('!') ? value.substr(1) : value;
+                copy.type = 'selector';
+                return copy;
+              })
+        };
+      })
       .map(filter => {
         const finalFilter = _.omit(filter, 'negate');
         if (filter.negate) {
-          return { "type": "not", "field": finalFilter };
+          return {"type": "not", "field": finalFilter};
         }
         return finalFilter;
       });

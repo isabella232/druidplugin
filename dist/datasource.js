@@ -35,6 +35,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     ];
                     this.filterTemplateExpanders = {
                         "selector": ['value'],
+                        "array": ['value'],
                         "regex": ['pattern'],
                         "javascript": ['function'],
                         "search": []
@@ -302,10 +303,28 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                 ;
                 DruidDatasource.prototype.buildFilterTree = function (filters) {
                     var _this = this;
-                    var replacedFilters = filters.map(function (filter) {
+                    var replacedFilters = filters
+                        .map(function (filter) {
                         return _this.replaceTemplateValues(filter, _this.filterTemplateExpanders[filter.type]);
                     })
                         .filter(function (f) { return f[_this.filterTemplateExpanders[f.type]]; })
+                        .map(function (f) {
+                        if (f.type !== 'array')
+                            return f;
+                        var negate = f.value.startsWith('!') || f.negate;
+                        if (f.value.startsWith('!'))
+                            f.value = f.value.substr(1);
+                        return {
+                            'type': 'or',
+                            'negate': negate,
+                            'fields': f.value.split(',').map(function (value) {
+                                var copy = lodash_1.default.omit(f, 'negate');
+                                copy.value = value.startsWith('!') ? value.substr(1) : value;
+                                copy.type = 'selector';
+                                return copy;
+                            })
+                        };
+                    })
                         .map(function (filter) {
                         var finalFilter = lodash_1.default.omit(filter, 'negate');
                         if (filter.negate) {

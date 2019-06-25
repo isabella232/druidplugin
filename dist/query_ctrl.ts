@@ -36,6 +36,7 @@ export class DruidQueryCtrl extends QueryCtrl {
   };
   filterValidators = {
     "selector": this.validateSelectorFilter.bind(this),
+    "array": this.validateSelectorFilter.bind(this),
     "regex": this.validateRegexFilter.bind(this),
     "javascript": this.validateJavascriptFilter.bind(this)
   };

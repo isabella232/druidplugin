@@ -39,6 +39,7 @@ System.register(["lodash", "app/plugins/sdk", "./css/query_editor.css!"], functi
                     };
                     _this.filterValidators = {
                         "selector": _this.validateSelectorFilter.bind(_this),
+                        "array": _this.validateSelectorFilter.bind(_this),
                         "regex": _this.validateRegexFilter.bind(_this),
                         "javascript": _this.validateJavascriptFilter.bind(_this)
                     };
