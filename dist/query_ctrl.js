@@ -129,7 +129,7 @@ System.register(["lodash", "app/plugins/sdk", "./css/query_editor.css!"], functi
                     };
                     _this.getFilterValues = function (query, callback) {
                         var dimension = _this.target.currentFilter.dimension;
-                        _this.datasource.getFilterValues(_this.target, _this.panelCtrl.range, query)
+                        _this.datasource.getFilterValues(_this.target, _this.panelCtrl.range, query, _this.panelCtrl.panel.id)
                             .then(function (results) {
                             callback(results.data[0].result.map(function (datum) { return datum[dimension]; }));
                         });

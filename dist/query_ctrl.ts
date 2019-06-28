@@ -145,7 +145,7 @@ export class DruidQueryCtrl extends QueryCtrl {
 
     this.getFilterValues = (query, callback) => {
       let dimension = this.target.currentFilter.dimension;
-      this.datasource.getFilterValues(this.target, this.panelCtrl.range, query)
+      this.datasource.getFilterValues(this.target, this.panelCtrl.range, query, this.panelCtrl.panel.id)
         .then(function (results) {
           callback(results.data[0].result.map(function (datum) { return datum[dimension]; }));
         });

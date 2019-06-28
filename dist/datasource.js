@@ -40,6 +40,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         "javascript": ['function'],
                         "search": []
                     };
+                    this.scopedVars = {};
                     this.name = instanceSettings.name;
                     this.id = instanceSettings.id;
                     this.url = instanceSettings.url;
@@ -55,6 +56,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     var _this = this;
                     var from = this.dateToMoment(options.range.from, false);
                     var to = this.dateToMoment(options.range.to, true);
+                    this.scopedVars[options.panelId] = options.scopedVars;
                     var promises = options.targets.map(function (target) {
                         if (target.hide === true || lodash_1.default.isEmpty(target.druidDS) || (lodash_1.default.isEmpty(target.aggregators) && target.queryType !== "select")) {
                             var d = _this.q.defer();
@@ -64,7 +66,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         var maxDataPointsByResolution = options.maxDataPoints;
                         var maxDataPointsByConfig = target.maxDataPoints ? target.maxDataPoints : Number.MAX_VALUE;
                         var maxDataPoints = Math.min(maxDataPointsByResolution, maxDataPointsByConfig);
-                        var customGranularity = _this.templateSrv.replace(target.customGranularity);
+                        var customGranularity = _this.templateSrv.replace(target.customGranularity, _this.scopedVars[options.panelId]);
                         var shouldOverrideGranularity = target.shouldOverrideGranularity && (customGranularity !== 'auto');
                         var granularity = shouldOverrideGranularity ? customGranularity : _this.computeGranularity(from, to, maxDataPoints);
                         var roundedFrom = granularity === "all" ? from : _this.roundUpStartTime(from, granularity);
@@ -73,7 +75,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                                 granularity = { "type": "period", "period": "P1D", "timeZone": _this.periodGranularity };
                             }
                         }
-                        return _this.doQuery(roundedFrom, to, granularity, target)
+                        return _this.doQuery(roundedFrom, to, granularity, target, options.panelId)
                             .then(function (response) {
                             if (target.postAggregators)
                                 target.postAggregators
@@ -90,13 +92,13 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         return { data: lodash_1.default.flatten(results) };
                     });
                 };
-                DruidDatasource.prototype.doQuery = function (from, to, granularity, target) {
+                DruidDatasource.prototype.doQuery = function (from, to, granularity, target, panelId) {
                     var _this = this;
                     var datasource = target.druidDS;
                     var filters = target.filters;
                     var aggregators = target.aggregators.map(this.splitArrayFields);
                     var postAggregators = target.postAggregators ? target.postAggregators.map(this.splitArrayFields) : [];
-                    var groupBy = lodash_1.default.map(target.groupBy, function (e) { return _this.templateSrv.replace(e); });
+                    var groupBy = lodash_1.default.map(target.groupBy, function (e) { return _this.templateSrv.replace(e, _this.scopedVars[panelId]); });
                     var limitSpec = null;
                     var metricNames = this.getMetricNames(aggregators, postAggregators);
                     var intervals = this.getQueryIntervals(from, to);
@@ -110,27 +112,27 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     if (target.queryType === 'topN') {
                         var threshold = target.limit;
                         var metric_1 = target.druidMetric;
-                        var dimension_1 = this.templateSrv.replace(target.dimension);
-                        promise = this.topNQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, threshold, metric_1, dimension_1)
+                        var dimension_1 = this.templateSrv.replace(target.dimension, this.scopedVars[panelId]);
+                        promise = this.topNQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, threshold, metric_1, dimension_1, panelId)
                             .then(function (response) {
                             return _this.convertTopNData(response.data, dimension_1, metric_1);
                         });
                     }
                     else if (target.queryType === 'groupBy') {
                         limitSpec = this.getLimitSpec(target.limit, target.orderBy);
-                        promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec)
+                        promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
                             .then(function (response) {
                             return _this.convertGroupByData(response.data, groupBy, metricNames);
                         });
                     }
                     else if (target.queryType === 'select') {
-                        promise = this.selectQuery(datasource, intervals, granularity, selectDimensions, selectMetrics, filters, selectThreshold);
+                        promise = this.selectQuery(datasource, intervals, granularity, selectDimensions, selectMetrics, filters, selectThreshold, panelId);
                         return promise.then(function (response) {
                             return _this.convertSelectData(response.data);
                         });
                     }
                     else {
-                        promise = this.timeSeriesQuery(datasource, intervals, granularity, filters, aggregators, postAggregators)
+                        promise = this.timeSeriesQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, panelId)
                             .then(function (response) {
                             return _this.convertTimeSeriesData(response.data, metricNames);
                         });
@@ -153,7 +155,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     }
                     return aggregator;
                 };
-                DruidDatasource.prototype.selectQuery = function (datasource, intervals, granularity, dimensions, metric, filters, selectThreshold) {
+                DruidDatasource.prototype.selectQuery = function (datasource, intervals, granularity, dimensions, metric, filters, selectThreshold, panelId) {
                     var query = {
                         "queryType": "select",
                         "dataSource": datasource,
@@ -164,12 +166,12 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         "intervals": intervals
                     };
                     if (filters && filters.length > 0) {
-                        query.filter = this.buildFilterTree(filters);
+                        query.filter = this.buildFilterTree(filters, panelId);
                     }
                     return this.druidQuery(query);
                 };
                 ;
-                DruidDatasource.prototype.timeSeriesQuery = function (datasource, intervals, granularity, filters, aggregators, postAggregators) {
+                DruidDatasource.prototype.timeSeriesQuery = function (datasource, intervals, granularity, filters, aggregators, postAggregators, panelId) {
                     var query = {
                         queryType: "timeseries",
                         dataSource: datasource,
@@ -179,12 +181,12 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         intervals: intervals
                     };
                     if (filters && filters.length > 0) {
-                        query.filter = this.buildFilterTree(filters);
+                        query.filter = this.buildFilterTree(filters, panelId);
                     }
                     return this.druidQuery(query);
                 };
                 ;
-                DruidDatasource.prototype.topNQuery = function (datasource, intervals, granularity, filters, aggregators, postAggregators, threshold, metric, dimension) {
+                DruidDatasource.prototype.topNQuery = function (datasource, intervals, granularity, filters, aggregators, postAggregators, threshold, metric, dimension, panelId) {
                     var query = {
                         queryType: "topN",
                         dataSource: datasource,
@@ -197,12 +199,12 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         intervals: intervals
                     };
                     if (filters && filters.length > 0) {
-                        query.filter = this.buildFilterTree(filters);
+                        query.filter = this.buildFilterTree(filters, panelId);
                     }
                     return this.druidQuery(query);
                 };
                 ;
-                DruidDatasource.prototype.groupByQuery = function (datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec) {
+                DruidDatasource.prototype.groupByQuery = function (datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId) {
                     var query = {
                         queryType: "groupBy",
                         dataSource: datasource,
@@ -214,7 +216,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         limitSpec: limitSpec,
                     };
                     if (filters && filters.length > 0) {
-                        query.filter = this.buildFilterTree(filters);
+                        query.filter = this.buildFilterTree(filters, panelId);
                     }
                     return this.druidQuery(query);
                 };
@@ -265,7 +267,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     });
                 };
                 ;
-                DruidDatasource.prototype.getFilterValues = function (target, panelRange, query) {
+                DruidDatasource.prototype.getFilterValues = function (target, panelRange, query, panelId) {
                     var topNquery = {
                         "queryType": "topN",
                         "dataSource": target.druidDS,
@@ -289,7 +291,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                             "value": query
                         }
                     });
-                    topNquery.filter = this.buildFilterTree(filters);
+                    topNquery.filter = this.buildFilterTree(filters, panelId);
                     return this.druidQuery(topNquery);
                 };
                 ;
@@ -301,11 +303,11 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     });
                 };
                 ;
-                DruidDatasource.prototype.buildFilterTree = function (filters) {
+                DruidDatasource.prototype.buildFilterTree = function (filters, panelId) {
                     var _this = this;
                     var replacedFilters = filters
                         .map(function (filter) {
-                        return _this.replaceTemplateValues(filter, _this.filterTemplateExpanders[filter.type]);
+                        return _this.replaceTemplateValues(filter, _this.filterTemplateExpanders[filter.type], panelId);
                     })
                         .filter(function (f) { return f[_this.filterTemplateExpanders[f.type]]; })
                         .map(function (f) {
@@ -494,10 +496,10 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     }
                     return rounded;
                 };
-                DruidDatasource.prototype.replaceTemplateValues = function (obj, attrList) {
+                DruidDatasource.prototype.replaceTemplateValues = function (obj, attrList, panelId) {
                     var _this = this;
                     var substitutedVals = attrList.map(function (attr) {
-                        return _this.templateSrv.replace(obj[attr]);
+                        return _this.templateSrv.replace(obj[attr], _this.scopedVars[panelId]);
                     });
                     return lodash_1.default.assign(lodash_1.default.clone(obj, true), lodash_1.default.zipObject(attrList, substitutedVals));
                 };
