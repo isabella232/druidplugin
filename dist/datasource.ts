@@ -362,7 +362,7 @@ export default class DruidDatasource {
       .filter(f => f[this.filterTemplateExpanders[f.type]])
       .map(f => {
         if (f.type !== 'array') return f;
-        if (f.value === 'skipFilter') return undefined;
+        if (f.value.startsWith('skipFilter')) return undefined;
         let negate = f.value.startsWith('!') || f.negate;
         if (f.value.startsWith('!')) f.value = f.value.substr(1);
         return {

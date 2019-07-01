@@ -313,7 +313,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         .map(function (f) {
                         if (f.type !== 'array')
                             return f;
-                        if (f.value === 'skipFilter')
+                        if (f.value.startsWith('skipFilter'))
                             return undefined;
                         var negate = f.value.startsWith('!') || f.negate;
                         if (f.value.startsWith('!'))
