@@ -313,6 +313,8 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         .map(function (f) {
                         if (f.type !== 'array')
                             return f;
+                        if (f.value === 'skipFilter')
+                            return undefined;
                         var negate = f.value.startsWith('!') || f.negate;
                         if (f.value.startsWith('!'))
                             f.value = f.value.substr(1);
@@ -321,12 +323,13 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                             'negate': negate,
                             'fields': f.value.split(',').map(function (value) {
                                 var copy = lodash_1.default.omit(f, 'negate');
-                                copy.value = value.startsWith('!') ? value.substr(1) : value;
+                                copy.value = value;
                                 copy.type = 'selector';
                                 return copy;
                             })
                         };
                     })
+                        .filter(function (f) { return f; })
                         .map(function (filter) {
                         var finalFilter = lodash_1.default.omit(filter, 'negate');
                         if (filter.negate) {

@@ -362,6 +362,7 @@ export default class DruidDatasource {
       .filter(f => f[this.filterTemplateExpanders[f.type]])
       .map(f => {
         if (f.type !== 'array') return f;
+        if (f.value === 'skipFilter') return undefined;
         let negate = f.value.startsWith('!') || f.negate;
         if (f.value.startsWith('!')) f.value = f.value.substr(1);
         return {
@@ -370,12 +371,13 @@ export default class DruidDatasource {
           'fields':
               f.value.split(',').map(value => {
                 let copy = _.omit(f, 'negate');
-                copy.value = value.startsWith('!') ? value.substr(1) : value;
+                copy.value = value;
                 copy.type = 'selector';
                 return copy;
               })
         };
       })
+      .filter(f => f)
       .map(filter => {
         const finalFilter = _.omit(filter, 'negate');
         if (filter.negate) {
