@@ -56,12 +56,20 @@
       </label>
     </div>
     <div ng-switch-when="topN" class="gf-form">
-
       <label class="gf-form-label query-keyword width-4">
         Metric
       </label>
       <input type="text" class="gf-form-input" ng-model="ctrl.target.druidMetric" spellcheck='false' placeholder="metric" ng-blur="ctrl.targetBlur()" />
       <label class="gf-form-label" bs-tooltip="ctrl.target.errors.druidMetric" style="color: rgb(229, 189, 28)" ng-show="ctrl.target.errors.druidMetric">
+        <i class="fa fa-warning"></i>
+      </label>
+    </div>
+    <div ng-switch-when="topN" class="gf-form">
+      <label class="gf-form-label query-keyword width-8">
+        Metric to show
+      </label>
+      <input type="text" class="gf-form-input" ng-model="ctrl.target.druidMetricToShow" spellcheck='false' placeholder="metric" ng-blur="ctrl.targetBlur()" />
+      <label class="gf-form-label" bs-tooltip="ctrl.target.errors.druidMetricToShow" style="color: rgb(229, 189, 28)" ng-show="ctrl.target.errors.druidMetricToShow">
         <i class="fa fa-warning"></i>
       </label>
     </div>

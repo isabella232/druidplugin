@@ -118,10 +118,11 @@ export default class DruidDatasource {
     if (target.queryType === 'topN') {
       let threshold = target.limit;
       let metric = target.druidMetric;
+      let metricToShow = target.druidMetricToShow;
       let dimension = this.templateSrv.replace(target.dimension, this.scopedVars[panelId]);
       promise = this.topNQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, threshold, metric, dimension, panelId)
         .then(response => {
-          return this.convertTopNData(response.data, dimension, metric);
+          return this.convertTopNData(response.data, dimension, metricToShow ? metricToShow : metric);
         });
     }
     else if (target.queryType === 'groupBy') {

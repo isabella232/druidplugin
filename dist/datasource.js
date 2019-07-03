@@ -112,10 +112,11 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     if (target.queryType === 'topN') {
                         var threshold = target.limit;
                         var metric_1 = target.druidMetric;
+                        var metricToShow_1 = target.druidMetricToShow;
                         var dimension_1 = this.templateSrv.replace(target.dimension, this.scopedVars[panelId]);
                         promise = this.topNQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, threshold, metric_1, dimension_1, panelId)
                             .then(function (response) {
-                            return _this.convertTopNData(response.data, dimension_1, metric_1);
+                            return _this.convertTopNData(response.data, dimension_1, metricToShow_1 ? metricToShow_1 : metric_1);
                         });
                     }
                     else if (target.queryType === 'groupBy') {
