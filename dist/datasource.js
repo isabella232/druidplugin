@@ -314,6 +314,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     })
                         .filter(function (f) { return f[_this.filterTemplateExpanders[f.type]]; })
                         .map(function (f) {
+                        f.dimension = _this.templateSrv.replace(f.dimension, _this.scopedVars[panelId]);
                         if (f.type !== 'array')
                             return f;
                         if (f.value.startsWith('skipFilter'))
