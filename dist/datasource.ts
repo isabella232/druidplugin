@@ -81,19 +81,31 @@ export default class DruidDatasource {
       }
       return this.doQuery(roundedFrom, to, granularity, target, options.panelId)
         .then(response => {
-          if (target.postAggregators) target.postAggregators
-            .filter(a => (a.type === 'fieldAccess' || a.type === 'arithmetic') && a.extMultiplier)
-            .forEach(a => {
-              response.filter(r => r.target === a.name)
-                .flatMap(r => r.datapoints)
-                .forEach(dp => dp[0] = dp[0] * a.extMultiplier)
-            });
+          this.applyMultiplier(target.aggregators, ['longSum', 'doubleSum'], response);
+          this.applyMultiplier(target.postAggregators, ['fieldAccess', 'arithmetic'], response);
           return response;
         });
     });
 
     return this.q.all(promises).then(results => {
       return { data: _.flatten(results) };
+    });
+  }
+
+  applyMultiplier(aggregator, types, data) {
+    if (!aggregator) return;
+    aggregator.filter(a => _.includes(types, a.type) && a.extMultiplier)
+      .forEach(a => {
+        // transform timeseries
+        data.filter(r => r.target === a.name)
+          .flatMap(r => r.datapoints)
+          .forEach(dp => dp[0] = dp[0] * a.extMultiplier);
+        // transform tables
+        data.filter(set => set.columns && set.rows && set.columns.find(v => v.text === a.name))
+          .forEach(set => {
+              let i = set.columns.findIndex(v => v.text === a.name);
+              set.rows.forEach(r => r[i] *= a.extMultiplier);
+          });
     });
   }
 

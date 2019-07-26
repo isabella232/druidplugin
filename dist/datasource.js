@@ -77,19 +77,28 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         }
                         return _this.doQuery(roundedFrom, to, granularity, target, options.panelId)
                             .then(function (response) {
-                            if (target.postAggregators)
-                                target.postAggregators
-                                    .filter(function (a) { return (a.type === 'fieldAccess' || a.type === 'arithmetic') && a.extMultiplier; })
-                                    .forEach(function (a) {
-                                    response.filter(function (r) { return r.target === a.name; })
-                                        .flatMap(function (r) { return r.datapoints; })
-                                        .forEach(function (dp) { return dp[0] = dp[0] * a.extMultiplier; });
-                                });
+                            _this.applyMultiplier(target.aggregators, ['longSum', 'doubleSum'], response);
+                            _this.applyMultiplier(target.postAggregators, ['fieldAccess', 'arithmetic'], response);
                             return response;
                         });
                     });
                     return this.q.all(promises).then(function (results) {
                         return { data: lodash_1.default.flatten(results) };
+                    });
+                };
+                DruidDatasource.prototype.applyMultiplier = function (aggregator, types, data) {
+                    if (!aggregator)
+                        return;
+                    aggregator.filter(function (a) { return lodash_1.default.includes(types, a.type) && a.extMultiplier; })
+                        .forEach(function (a) {
+                        data.filter(function (r) { return r.target === a.name; })
+                            .flatMap(function (r) { return r.datapoints; })
+                            .forEach(function (dp) { return dp[0] = dp[0] * a.extMultiplier; });
+                        data.filter(function (set) { return set.columns && set.rows && set.columns.find(function (v) { return v.text === a.name; }); })
+                            .forEach(function (set) {
+                            var i = set.columns.findIndex(function (v) { return v.text === a.name; });
+                            set.rows.forEach(function (r) { return r[i] *= a.extMultiplier; });
+                        });
                     });
                 };
                 DruidDatasource.prototype.doQuery = function (from, to, granularity, target, panelId) {

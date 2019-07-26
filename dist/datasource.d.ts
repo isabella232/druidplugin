@@ -21,6 +21,7 @@ export default class DruidDatasource {
     scopedVars: any;
     constructor(instanceSettings: any, $q: any, backendSrv: any, templateSrv: any);
     query(options: any): any;
+    applyMultiplier(aggregator: any, types: any, data: any): void;
     doQuery(from: any, to: any, granularity: any, target: any, panelId: any): any;
     splitArrayFields(aggregator: any): any;
     selectQuery(datasource: string, intervals: Array<string>, granularity: Druid.Granularity, dimensions: Array<string | Object>, metric: Array<string | Object>, filters: Array<Druid.DruidFilter>, selectThreshold: Object, panelId: number): any;

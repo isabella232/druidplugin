@@ -320,6 +320,7 @@
         <div ng-switch-when="longSum">
           <label class="gf-form-label">
             {{aggregator.name}}&nbsp;=&nbsp;{{aggregator.type}}({{aggregator.fieldName}})
+            <span ng-show="aggregator.extMultiplier">&nbsp;*&nbsp;{{aggregator.extMultiplier}}</span>
             <a ng-click="ctrl.editAggregator($index)">
               <i class="fa fa-pencil"></i>
             </a>
@@ -331,6 +332,7 @@
         <div ng-switch-when="doubleSum">
           <label class="gf-form-label">
             {{aggregator.name}}&nbsp;=&nbsp;{{aggregator.type}}({{aggregator.fieldName}})
+            <span ng-show="aggregator.extMultiplier">&nbsp;*&nbsp;{{aggregator.extMultiplier}}</span>
             <a ng-click="ctrl.editAggregator($index)">
               <i class="fa fa-pencil"></i>
             </a>
@@ -397,11 +399,13 @@
     <div class="gf-form" ng-show="ctrl.addAggregatorMode" ng-switch on="ctrl.target.currentAggregator.type">
       <input type="text" ng-switch-when="longSum" class="input-small gf-form-input width-10" spellcheck='false' ng-model="ctrl.target.currentAggregator.name" placeholder="output name" ng-blur="ctrl.targetBlur()">
       <input type="text" ng-switch-when="longSum" class="input-small gf-form-input width-10" spellcheck='false' ng-model="ctrl.target.currentAggregator.fieldName" ng-blur="ctrl.targetBlur()" placeholder="metric name" bs-typeahead="ctrl.getMetrics" data-min-length=0>
+      <input type="text" ng-switch-when="longSum" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentAggregator.extMultiplier" placeholder="multiplier" ng-blur="ctrl.targetBlur()">
       <gf-form-switch ng-switch-when="longSum" class="gf-form" label="Hidden" label-class="query-keyword" checked="ctrl.target.currentAggregator.hidden"></gf-form-switch>
     </div>
     <div class="gf-form" ng-show="ctrl.addAggregatorMode" ng-switch on="ctrl.target.currentAggregator.type">
       <input type="text" ng-switch-when="doubleSum" class="input-small gf-form-input width-10" spellcheck='false' ng-model="ctrl.target.currentAggregator.name" placeholder="output name" ng-blur="ctrl.targetBlur()">
       <input type="text" ng-switch-when="doubleSum" class="input-small gf-form-input width-10" spellcheck='false' ng-model="ctrl.target.currentAggregator.fieldName" placeholder="metric name" bs-typeahead="ctrl.getMetrics" ng-blur="ctrl.targetBlur()">
+      <input type="text" ng-switch-when="doubleSum" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentAggregator.extMultiplier" placeholder="multiplier" ng-blur="ctrl.targetBlur()">
       <gf-form-switch ng-switch-when="doubleSum" class="gf-form" label="Hidden" label-class="query-keyword" checked="ctrl.target.currentAggregator.hidden"></gf-form-switch>
     </div>
     <div class="gf-form" ng-show="ctrl.addAggregatorMode" ng-switch on="ctrl.target.currentAggregator.type">
