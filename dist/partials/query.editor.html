@@ -17,7 +17,7 @@
           <i class="fa fa-warning"></i>
         </a>
       </label>
-      <div class="gf-form-select-wrapper max-width-15">
+      <div class="gf-form-select-wrapper">
         <select ng-model="ctrl.target.queryType" class="gf-form-input" ng-options="type for type in ctrl.queryTypes" ng-change="ctrl.targetBlur()">
         </select>
       </div>
@@ -92,7 +92,6 @@
       </label>
     </div>
     <div ng-switch-when="groupBy" class="gf-form">
-
       <label class="gf-form-label query-keyword width-4">
         Limit
       </label>
@@ -109,6 +108,15 @@
       <label class="gf-form-label" bs-tooltip="ctrl.target.errors.getDimensions" style="color: rgb(229, 189, 28)" ng-show="ctrl.target.errors.getDimensions">
         <i class="fa fa-warning"></i>
       </label>
+    </div>
+    <div ng-switch-when="groupBy" class="gf-form">
+      <label class="gf-form-label query-keyword width-5">
+        Type
+      </label>
+      <select ng-model="ctrl.target.tableType" class="gf-form-input" ng-change="ctrl.targetBlur()">
+        <option value="table">table</option>
+        <option value="timeseries">timeseries</option>
+      </select>
     </div>
     <div ng-switch-when="select" class="gf-form">
       <label class="gf-form-label query-keyword width-9">
@@ -197,7 +205,7 @@
 
     <div class="gf-form" ng-repeat="filter in ctrl.target.filters track by $index" ng-switch on="filter.type">
       <label class="gf-form-label" ng-if="filter.negate">NOT&nbsp;(&nbsp;</label>
-      <label ng-switch-when="regex" class="gf-form-label">{{filter.type}}:&nbsp;{{filter.dimension}}&nbsp;=&nbsp;{{filter.pattern}}
+      <label ng-switch-when="regex" class="gf-form-label">{{filter.dimension}}&nbsp;=&nbsp;{{filter.type}}:&nbsp;{{filter.pattern}}
         <a ng-click="ctrl.editFilter($index)">
           <i class="fa fa-pencil"></i>
         </a>
@@ -206,7 +214,7 @@
         </a>
       </label>
       <label ng-switch-when="selector" class="gf-form-label">
-        {{filter.type}}:&nbsp;{{filter.dimension}}&nbsp;=&nbsp;{{filter.value}}
+        {{filter.dimension}}&nbsp;=&nbsp;{{filter.type}}:&nbsp;{{filter.value}}
         <a ng-click="ctrl.editFilter($index)">
           <i class="fa fa-pencil"></i>
         </a>
@@ -215,7 +223,7 @@
         </a>
       </label>
       <label ng-switch-when="array" class="gf-form-label">
-        {{filter.type}}:&nbsp;{{filter.dimension}}&nbsp;=&nbsp;{{filter.value}}
+        {{filter.dimension}}&nbsp;=&nbsp;{{filter.type}}:&nbsp;{{filter.value}}
         <a ng-click="ctrl.editFilter($index)">
           <i class="fa fa-pencil"></i>
         </a>
@@ -224,7 +232,7 @@
         </a>
       </label>
       <label ng-switch-when="javascript" class="gf-form-label">
-        {{filter.type}}:&nbsp;{{filter.dimension}}&nbsp;=&nbsp;{{filter.function}}
+        {{filter.dimension}}&nbsp;=&nbsp;{{filter.type}}:&nbsp;{{filter.function}}
         <a ng-click="ctrl.editFilter($index)">
           <i class="fa fa-pencil"></i>
         </a>
@@ -289,7 +297,7 @@
       <div ng-switch on="aggregator.type">
         <div ng-switch-when="count">
           <label class="gf-form-label">
-            {{aggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{aggregator.name}}
+            {{aggregator.name}}&nbsp;=&nbsp;{{aggregator.type}}
             <a ng-click="ctrl.editAggregator($index)">
               <i class="fa fa-pencil"></i>
             </a>
@@ -300,7 +308,7 @@
         </div>
         <div ng-switch-when="cardinality">
           <label class="gf-form-label">
-            {{aggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{aggregator.name}},&nbsp;fieldNames&nbsp;=&nbsp;{{aggregator.fieldNames}}
+            {{aggregator.name}}&nbsp;=&nbsp;{{aggregator.type}}({{aggregator.fieldNames}})
             <a ng-click="ctrl.editAggregator($index)">
               <i class="fa fa-pencil"></i>
             </a>
@@ -311,7 +319,7 @@
         </div>
         <div ng-switch-when="longSum">
           <label class="gf-form-label">
-            {{aggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{aggregator.name}},&nbsp;fieldName&nbsp;=&nbsp;{{aggregator.fieldName}}
+            {{aggregator.name}}&nbsp;=&nbsp;{{aggregator.type}}({{aggregator.fieldName}})
             <a ng-click="ctrl.editAggregator($index)">
               <i class="fa fa-pencil"></i>
             </a>
@@ -322,7 +330,7 @@
         </div>
         <div ng-switch-when="doubleSum">
           <label class="gf-form-label">
-            {{aggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{aggregator.name}},&nbsp;fieldName&nbsp;=&nbsp;{{aggregator.fieldName}}
+            {{aggregator.name}}&nbsp;=&nbsp;{{aggregator.type}}({{aggregator.fieldName}})
             <a ng-click="ctrl.editAggregator($index)">
               <i class="fa fa-pencil"></i>
             </a>
@@ -333,7 +341,7 @@
         </div>
         <div ng-switch-when="approxHistogramFold">
           <label class="gf-form-label">
-            {{aggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{aggregator.name}},&nbsp;fieldName&nbsp;=&nbsp;{{aggregator.fieldName}}
+            {{aggregator.name}}&nbsp;=&nbsp;{{aggregator.type}}({{aggregator.fieldName}})
             <a ng-click="ctrl.editAggregator($index)">
               <i class="fa fa-pencil"></i>
             </a>
@@ -344,7 +352,7 @@
         </div>
         <div ng-switch-when="hyperUnique">
           <label class="gf-form-label">
-          {{aggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{aggregator.name}},&nbsp;fieldName&nbsp;=&nbsp;{{aggregator.fieldName}}
+            {{aggregator.name}}&nbsp;=&nbsp;{{aggregator.type}}({{aggregator.fieldName}})
             <a ng-click="ctrl.editAggregator($index)">
               <i class="fa fa-pencil"></i>
             </a>
@@ -355,7 +363,7 @@
         </div>
         <div ng-switch-when="thetaSketch">
           <label class="gf-form-label">
-          {{aggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{aggregator.name}},&nbsp;fieldName&nbsp;=&nbsp;{{aggregator.fieldName}}
+            {{aggregator.name}}&nbsp;=&nbsp;{{aggregator.type}}({{aggregator.fieldName}})
             <a ng-click="ctrl.editAggregator($index)">
               <i class="fa fa-pencil"></i>
             </a>
@@ -436,7 +444,8 @@
     <div ng-switch on="postAggregator.type">
       <div ng-switch-when="arithmetic">
         <label class="gf-form-label">
-          {{postAggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{postAggregator.name}},&nbsp;fn&nbsp;=&nbsp;{{postAggregator.fn}}, &nbsp;fields&nbsp;=&nbsp;{{postAggregator.fields}}
+          {{postAggregator.name}}&nbsp;=&nbsp;({{postAggregator.fields[0].fieldName}}&nbsp;{{postAggregator.fn}}&nbsp;{{postAggregator.fields[1].fieldName}})
+            <span ng-show="postAggregator.extMultiplier">&nbsp;*&nbsp;{{postAggregator.extMultiplier}}</span>
           <a ng-click="ctrl.removePostAggregator($index)">
             <i class="fa fa-remove"></i>
           </a>
@@ -444,7 +453,7 @@
       </div>
       <div ng-switch-when="max">
         <label class="gf-form-label">
-          {{postAggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{postAggregator.name}},&nbsp;field&nbsp;=&nbsp;{{postAggregator.fieldName}}
+          {{postAggregator.name}}&nbsp;=&nbsp;{{postAggregator.type}}&nbsp;({{postAggregator.fieldName}})
           <a ng-click="ctrl.removePostAggregator($index)">
             <i class="fa fa-remove"></i>
           </a>
@@ -452,7 +461,7 @@
       </div>
       <div ng-switch-when="min">
         <label class="gf-form-label">
-          {{postAggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{postAggregator.name}},&nbsp;field&nbsp;=&nbsp;{{postAggregator.fieldName}}
+          {{postAggregator.name}}&nbsp;=&nbsp;{{postAggregator.type}}&nbsp;({{postAggregator.fieldName}})
           <a ng-click="ctrl.removePostAggregator($index)">
             <i class="fa fa-remove"></i>
           </a>
@@ -460,7 +469,7 @@
       </div>
       <div ng-switch-when="constant">
         <label class="gf-form-label">
-          {{postAggregator.type}}:&nbsp;{{postAggregator.name}}&nbsp;=&nbsp;{{postAggregator.value}}
+          {{postAggregator.name}}&nbsp;=&nbsp;{{postAggregator.type}}&nbsp;({{postAggregator.value}})
           <a ng-click="ctrl.removePostAggregator($index)">
             <i class="fa fa-remove"></i>
           </a>
@@ -468,7 +477,8 @@
       </div>
       <div ng-switch-when="fieldAccess">
         <label class="gf-form-label">
-          {{postAggregator.type}}:&nbsp;{{postAggregator.name}}&nbsp;=&nbsp;{{postAggregator.fieldName}}&nbsp;*&nbsp;{{postAggregator.extMultiplier}}
+          {{postAggregator.name}}&nbsp;=&nbsp;{{postAggregator.type}}&nbsp;({{postAggregator.fieldName}})
+          <span ng-show="postAggregator.extMultiplier">&nbsp;*&nbsp;{{postAggregator.extMultiplier}}</span>
           <a ng-click="ctrl.removePostAggregator($index)">
             <i class="fa fa-remove"></i>
           </a>
@@ -476,7 +486,7 @@
       </div>
       <div ng-switch-when="quantile">
         <label class="gf-form-label">
-          {{postAggregator.type}}:&nbsp;name&nbsp;=&nbsp;{{postAggregator.name}},&nbsp;field&nbsp;=&nbsp;{{postAggregator.fieldName}}, &nbsp;prob&nbsp;=&nbsp;{{postAggregator.probability}}
+          {{postAggregator.name}}&nbsp;=&nbsp;{{postAggregator.type}}&nbsp;({{postAggregator.fieldName}},&nbsp;{{postAggregator.probability}})
           <a ng-click="ctrl.removePostAggregator($index)">
             <i class="fa fa-remove"></i>
           </a>
@@ -507,6 +517,7 @@
     <input type="text" ng-switch-when="arithmetic" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.name" placeholder="output name" ng-blur="ctrl.targetBlur()">
     <select ng-switch-when="arithmetic" class="input-small gf-form-input" ng-model="ctrl.target.currentPostAggregator.fn" ng-options="fn for fn in ctrl.arithmeticPostAggregator" ng-change="ctrl.targetBlur()"></select>
     <input type="text" ng-switch-when="arithmetic" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.fields" placeholder="field1,field2" ng-blur="ctrl.targetBlur()">
+    <input type="text" ng-switch-when="arithmetic" class="input-small gf-form-input" spellcheck="false" ng-model="ctrl.target.currentPostAggregator.extMultiplier" placeholder="multiplier" ng-blur="ctrl.targetBlur()">
   </div>
 
   <!-- max -->

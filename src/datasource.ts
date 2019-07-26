@@ -82,7 +82,7 @@ export default class DruidDatasource {
       return this.doQuery(roundedFrom, to, granularity, target, options.panelId)
         .then(response => {
           if (target.postAggregators) target.postAggregators
-            .filter(a => a.type === 'fieldAccess' && a.extMultiplier)
+            .filter(a => (a.type === 'fieldAccess' || a.type === 'arithmetic') && a.extMultiplier)
             .forEach(a => {
               response.filter(r => r.target === a.name)
                 .flatMap(r => r.datapoints)
@@ -129,7 +129,9 @@ export default class DruidDatasource {
       limitSpec = this.getLimitSpec(target.limit, target.orderBy);
       promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
         .then(response => {
-          return this.convertGroupByData(response.data, groupBy, metricNames);
+          return target.tableType === 'table'
+              ? this.convertGroupByDataAsTable(response.data, groupBy, metricNames)
+              : this.convertGroupByData(response.data, groupBy, metricNames);
         });
     }
     else if (target.queryType === 'select') {
@@ -163,7 +165,7 @@ export default class DruidDatasource {
     return promise.then(metrics => {
       let fromMs = this.formatTimestamp(from);
       metrics.forEach(metric => {
-        if (!_.isEmpty(metric.datapoints[0]) && metric.datapoints[0][1] < fromMs) {
+        if (metric.datapoints && !_.isEmpty(metric.datapoints[0]) && metric.datapoints[0][1] < fromMs) {
           metric.datapoints[0][1] = fromMs;
         }
       });
@@ -537,6 +539,24 @@ export default class DruidDatasource {
         datapoints: vals
       };
     });
+  }
+
+  convertGroupByDataAsTable(md, groupBy, metrics) {
+    let res: any = {};
+    res.type = 'table';
+    res.columns = metrics.reduce((a, v) => {
+      a.push({text: v});
+      return a;
+    }, []);
+    res.rows = md.reduce((a, d) => {
+      a.push(metrics.reduce((aa, m) => {
+        aa.push(d.event[m]);
+        return aa;
+      }, []));
+      return a;
+    }, []);
+    res.meta = {rowCount: md.length};
+    return [res];
   }
 
   convertGroupByData(md, groupBy, metrics) {

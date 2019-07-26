@@ -46,6 +46,7 @@ export default class DruidDatasource {
     convertTimeSeriesData(md: any, metrics: any): any;
     getGroupName(groupBy: any, metric: any): any;
     convertTopNData(md: any, dimension: any, metric: any): any;
+    convertGroupByDataAsTable(md: any, groupBy: any, metrics: any): any[];
     convertGroupByData(md: any, groupBy: any, metrics: any): any;
     convertSelectData(data: any): any;
     dateToMoment(date: any, roundUp: any): any;

@@ -79,7 +79,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                             .then(function (response) {
                             if (target.postAggregators)
                                 target.postAggregators
-                                    .filter(function (a) { return a.type === 'fieldAccess' && a.extMultiplier; })
+                                    .filter(function (a) { return (a.type === 'fieldAccess' || a.type === 'arithmetic') && a.extMultiplier; })
                                     .forEach(function (a) {
                                     response.filter(function (r) { return r.target === a.name; })
                                         .flatMap(function (r) { return r.datapoints; })
@@ -123,7 +123,9 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         limitSpec = this.getLimitSpec(target.limit, target.orderBy);
                         promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
                             .then(function (response) {
-                            return _this.convertGroupByData(response.data, groupBy, metricNames);
+                            return target.tableType === 'table'
+                                ? _this.convertGroupByDataAsTable(response.data, groupBy, metricNames)
+                                : _this.convertGroupByData(response.data, groupBy, metricNames);
                         });
                     }
                     else if (target.queryType === 'select') {
@@ -141,7 +143,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     return promise.then(function (metrics) {
                         var fromMs = _this.formatTimestamp(from);
                         metrics.forEach(function (metric) {
-                            if (!lodash_1.default.isEmpty(metric.datapoints[0]) && metric.datapoints[0][1] < fromMs) {
+                            if (metric.datapoints && !lodash_1.default.isEmpty(metric.datapoints[0]) && metric.datapoints[0][1] < fromMs) {
                                 metric.datapoints[0][1] = fromMs;
                             }
                         });
@@ -422,6 +424,23 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                             datapoints: vals
                         };
                     });
+                };
+                DruidDatasource.prototype.convertGroupByDataAsTable = function (md, groupBy, metrics) {
+                    var res = {};
+                    res.type = 'table';
+                    res.columns = metrics.reduce(function (a, v) {
+                        a.push({ text: v });
+                        return a;
+                    }, []);
+                    res.rows = md.reduce(function (a, d) {
+                        a.push(metrics.reduce(function (aa, m) {
+                            aa.push(d.event[m]);
+                            return aa;
+                        }, []));
+                        return a;
+                    }, []);
+                    res.meta = { rowCount: md.length };
+                    return [res];
                 };
                 DruidDatasource.prototype.convertGroupByData = function (md, groupBy, metrics) {
                     var _this = this;
