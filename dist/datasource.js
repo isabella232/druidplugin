@@ -440,10 +440,13 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     res.columns = metrics.reduce(function (a, v) {
                         a.push({ text: v });
                         return a;
-                    }, []);
+                    }, groupBy.reduce(function (a, v) {
+                        a.push({ text: v });
+                        return a;
+                    }, []));
                     res.rows = md.reduce(function (a, d) {
-                        a.push(metrics.reduce(function (aa, m) {
-                            aa.push(d.event[m]);
+                        a.push(res.columns.reduce(function (aa, m) {
+                            aa.push(d.event[m.text]);
                             return aa;
                         }, []));
                         return a;

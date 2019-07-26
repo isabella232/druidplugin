@@ -559,10 +559,13 @@ export default class DruidDatasource {
     res.columns = metrics.reduce((a, v) => {
       a.push({text: v});
       return a;
-    }, []);
+    }, groupBy.reduce((a, v) => {
+      a.push({text: v});
+      return a;
+    }, []));
     res.rows = md.reduce((a, d) => {
-      a.push(metrics.reduce((aa, m) => {
-        aa.push(d.event[m]);
+      a.push(res.columns.reduce((aa, m) => {
+        aa.push(d.event[m.text]);
         return aa;
       }, []));
       return a;
