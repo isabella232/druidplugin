@@ -112,8 +112,10 @@ export default class DruidDatasource {
   doQuery(from, to, granularity, target, panelId) {
     let datasource = target.druidDS;
     let filters = target.filters;
-    let aggregators = target.aggregators.map(this.splitArrayFields);
-    let postAggregators = target.postAggregators ? target.postAggregators.map(this.splitArrayFields) : [];
+    let aggregators = this.replaceTemplateValues(target.aggregators, ['name', 'fieldName', 'fields'], panelId).map(this.splitArrayFields);
+    let postAggregators = target.postAggregators
+        ? this.replaceTemplateValues(target.postAggregators, ['name', 'fieldName', 'fields'], panelId).map(this.splitArrayFields)
+        : [];
     let groupBy = _.map(target.groupBy, (e) => { return this.templateSrv.replace(e, this.scopedVars[panelId]) });
     let limitSpec = null;
     let metricNames = this.getMetricNames(aggregators, postAggregators);
@@ -682,9 +684,17 @@ export default class DruidDatasource {
   }
 
   replaceTemplateValues(obj, attrList, panelId) {
-    const substitutedVals = attrList.map(attr => {
-      return this.templateSrv.replace(obj[attr], this.scopedVars[panelId]);
-    });
-    return _.assign(_.clone(obj, true), _.zipObject(attrList, substitutedVals));
+    if (_.isArray(obj)) {
+      return obj.map(e => this.replaceTemplateValues(e, attrList, panelId));
+    } else {
+      const substitutedVals = attrList.map(attr => {
+        if (_.isArray(obj[attr])) {
+          return obj[attr].map(e => this.replaceTemplateValues(e, attrList, panelId));
+        } else {
+          return this.templateSrv.replace(obj[attr], this.scopedVars[panelId]);
+        }
+      });
+      return _.assign(_.clone(obj, true), _.zipObject(attrList, substitutedVals));
+    }
   }
 }

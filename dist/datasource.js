@@ -105,8 +105,10 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     var _this = this;
                     var datasource = target.druidDS;
                     var filters = target.filters;
-                    var aggregators = target.aggregators.map(this.splitArrayFields);
-                    var postAggregators = target.postAggregators ? target.postAggregators.map(this.splitArrayFields) : [];
+                    var aggregators = this.replaceTemplateValues(target.aggregators, ['name', 'fieldName', 'fields'], panelId).map(this.splitArrayFields);
+                    var postAggregators = target.postAggregators
+                        ? this.replaceTemplateValues(target.postAggregators, ['name', 'fieldName', 'fields'], panelId).map(this.splitArrayFields)
+                        : [];
                     var groupBy = lodash_1.default.map(target.groupBy, function (e) { return _this.templateSrv.replace(e, _this.scopedVars[panelId]); });
                     var limitSpec = null;
                     var metricNames = this.getMetricNames(aggregators, postAggregators);
@@ -536,10 +538,20 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                 };
                 DruidDatasource.prototype.replaceTemplateValues = function (obj, attrList, panelId) {
                     var _this = this;
-                    var substitutedVals = attrList.map(function (attr) {
-                        return _this.templateSrv.replace(obj[attr], _this.scopedVars[panelId]);
-                    });
-                    return lodash_1.default.assign(lodash_1.default.clone(obj, true), lodash_1.default.zipObject(attrList, substitutedVals));
+                    if (lodash_1.default.isArray(obj)) {
+                        return obj.map(function (e) { return _this.replaceTemplateValues(e, attrList, panelId); });
+                    }
+                    else {
+                        var substitutedVals = attrList.map(function (attr) {
+                            if (lodash_1.default.isArray(obj[attr])) {
+                                return obj[attr].map(function (e) { return _this.replaceTemplateValues(e, attrList, panelId); });
+                            }
+                            else {
+                                return _this.templateSrv.replace(obj[attr], _this.scopedVars[panelId]);
+                            }
+                        });
+                        return lodash_1.default.assign(lodash_1.default.clone(obj, true), lodash_1.default.zipObject(attrList, substitutedVals));
+                    }
                 };
                 return DruidDatasource;
             }());
