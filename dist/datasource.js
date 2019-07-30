@@ -131,7 +131,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         });
                     }
                     else if (target.queryType === 'groupBy') {
-                        limitSpec = this.getLimitSpec(target.limit, target.orderBy);
+                        limitSpec = this.getLimitSpec(target.limit, target.orderBy, panelId);
                         promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
                             .then(function (response) {
                             return target.tableType === 'table'
@@ -244,12 +244,25 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     return this.backendSrv.datasourceRequest(options);
                 };
                 ;
-                DruidDatasource.prototype.getLimitSpec = function (limitNum, orderBy) {
+                DruidDatasource.prototype.getLimitSpec = function (limitNum, orderBy, panelId) {
+                    var _this = this;
                     return {
                         "type": "default",
                         "limit": limitNum,
                         "columns": !orderBy ? null : orderBy.map(function (col) {
-                            return { "dimension": col, "direction": "DESCENDING" };
+                            var columnName = _this.templateSrv.replace(col, _this.scopedVars[panelId]);
+                            if (columnName.startsWith('!')) {
+                                return {
+                                    "dimension": columnName.substr(1),
+                                    "direction": "ASCENDING"
+                                };
+                            }
+                            else {
+                                return {
+                                    "dimension": columnName,
+                                    "direction": "DESCENDING"
+                                };
+                            }
                         })
                     };
                 };

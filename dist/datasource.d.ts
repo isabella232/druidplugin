@@ -29,7 +29,7 @@ export default class DruidDatasource {
     topNQuery(datasource: string, intervals: Array<string>, granularity: Druid.Granularity, filters: Array<Druid.DruidFilter>, aggregators: Object, postAggregators: Object, threshold: number, metric: string | Object, dimension: string | Object, panelId: number): any;
     groupByQuery(datasource: string, intervals: Array<string>, granularity: Druid.Granularity, filters: Array<Druid.DruidFilter>, aggregators: Object, postAggregators: Object, groupBy: Array<string>, limitSpec: Druid.LimitSpec, panelId: number): any;
     druidQuery(query: Druid.AbstractDruidQuery): any;
-    getLimitSpec(limitNum: any, orderBy: any): {
+    getLimitSpec(limitNum: any, orderBy: any, panelId: any): {
         "type": string;
         "limit": any;
         "columns": any;

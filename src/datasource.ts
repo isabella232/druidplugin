@@ -140,7 +140,7 @@ export default class DruidDatasource {
         });
     }
     else if (target.queryType === 'groupBy') {
-      limitSpec = this.getLimitSpec(target.limit, target.orderBy);
+      limitSpec = this.getLimitSpec(target.limit, target.orderBy, panelId);
       promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
         .then(response => {
           return target.tableType === 'table'
@@ -286,12 +286,23 @@ export default class DruidDatasource {
     return this.backendSrv.datasourceRequest(options);
   };
 
-  getLimitSpec(limitNum, orderBy) {
+  getLimitSpec(limitNum, orderBy, panelId) {
     return {
       "type": "default",
       "limit": limitNum,
       "columns": !orderBy ? null : orderBy.map(col => {
-        return { "dimension": col, "direction": "DESCENDING" };
+        let columnName = this.templateSrv.replace(col, this.scopedVars[panelId]);
+        if (columnName.startsWith('!')) {
+          return {
+            "dimension": columnName.substr(1),
+            "direction": "ASCENDING"
+          };
+        } else {
+          return {
+            "dimension": columnName,
+            "direction": "DESCENDING"
+          };
+        }
       })
     };
   }
