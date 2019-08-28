@@ -121,7 +121,9 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         selectThreshold = 5;
                     }
                     if (target.queryType === 'topN') {
-                        var threshold = this.templateSrv.replace(target.limit, this.scopedVars[panelId]);
+                        var threshold = (typeof target.limit === 'string')
+                            ? this.templateSrv.replace(target.limit, this.scopedVars[panelId])
+                            : target.limit;
                         var metric_1 = target.druidMetric;
                         var metricToShow_1 = target.druidMetricToShow;
                         var dimension_1 = this.templateSrv.replace(target.dimension, this.scopedVars[panelId]);
@@ -131,7 +133,9 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         });
                     }
                     else if (target.queryType === 'groupBy') {
-                        var limit = this.templateSrv.replace(target.limit, this.scopedVars[panelId]);
+                        var limit = (typeof target.limit === 'string')
+                            ? this.templateSrv.replace(target.limit, this.scopedVars[panelId])
+                            : target.limit;
                         limitSpec = this.getLimitSpec(limit, target.orderBy, panelId);
                         promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
                             .then(function (response) {
