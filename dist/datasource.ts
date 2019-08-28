@@ -130,7 +130,7 @@ export default class DruidDatasource {
     }
 
     if (target.queryType === 'topN') {
-      let threshold = target.limit;
+      let threshold = this.templateSrv.replace(target.limit, this.scopedVars[panelId]);
       let metric = target.druidMetric;
       let metricToShow = target.druidMetricToShow;
       let dimension = this.templateSrv.replace(target.dimension, this.scopedVars[panelId]);
@@ -140,7 +140,8 @@ export default class DruidDatasource {
         });
     }
     else if (target.queryType === 'groupBy') {
-      limitSpec = this.getLimitSpec(target.limit, target.orderBy, panelId);
+      let limit = this.templateSrv.replace(target.limit, this.scopedVars[panelId]);
+      limitSpec = this.getLimitSpec(limit, target.orderBy, panelId);
       promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
         .then(response => {
           return target.tableType === 'table'
