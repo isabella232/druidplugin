@@ -96,15 +96,17 @@ export default class DruidDatasource {
     if (!aggregator) return;
     aggregator.filter(a => _.includes(types, a.type) && a.extMultiplier)
       .forEach(a => {
+        let name = this.replaceTemplateValuesNum(a.name, panelId),
+            extMultiplier = this.replaceTemplateValuesNum(a.extMultiplier, panelId);
         // transform timeseries
-        data.filter(r => r.target === a.name)
+        data.filter(r => r.target === name)
           .flatMap(r => r.datapoints)
-          .forEach(dp => dp[0] = dp[0] * this.replaceTemplateValuesNum(a.extMultiplier, panelId));
+          .forEach(dp => dp[0] = dp[0] * extMultiplier);
         // transform tables
-        data.filter(set => set.columns && set.rows && set.columns.find(v => v.text === a.name))
+        data.filter(set => set.columns && set.rows && set.columns.find(v => v.text === name))
           .forEach(set => {
-              let i = set.columns.findIndex(v => v.text === a.name);
-              set.rows.forEach(r => r[i] *= this.replaceTemplateValuesNum(a.extMultiplier, panelId));
+              let i = set.columns.findIndex(v => v.text === name);
+              set.rows.forEach(r => r[i] *= this.replaceTemplateValuesNum(extMultiplier, panelId));
           });
     });
   }

@@ -92,13 +92,14 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         return;
                     aggregator.filter(function (a) { return lodash_1.default.includes(types, a.type) && a.extMultiplier; })
                         .forEach(function (a) {
-                        data.filter(function (r) { return r.target === a.name; })
+                        var name = _this.replaceTemplateValuesNum(a.name, panelId), extMultiplier = _this.replaceTemplateValuesNum(a.extMultiplier, panelId);
+                        data.filter(function (r) { return r.target === name; })
                             .flatMap(function (r) { return r.datapoints; })
-                            .forEach(function (dp) { return dp[0] = dp[0] * _this.replaceTemplateValuesNum(a.extMultiplier, panelId); });
-                        data.filter(function (set) { return set.columns && set.rows && set.columns.find(function (v) { return v.text === a.name; }); })
+                            .forEach(function (dp) { return dp[0] = dp[0] * extMultiplier; });
+                        data.filter(function (set) { return set.columns && set.rows && set.columns.find(function (v) { return v.text === name; }); })
                             .forEach(function (set) {
-                            var i = set.columns.findIndex(function (v) { return v.text === a.name; });
-                            set.rows.forEach(function (r) { return r[i] *= _this.replaceTemplateValuesNum(a.extMultiplier, panelId); });
+                            var i = set.columns.findIndex(function (v) { return v.text === name; });
+                            set.rows.forEach(function (r) { return r[i] *= _this.replaceTemplateValuesNum(extMultiplier, panelId); });
                         });
                     });
                 };
