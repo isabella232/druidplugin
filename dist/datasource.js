@@ -77,8 +77,8 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         }
                         return _this.doQuery(roundedFrom, to, granularity, target, options.panelId)
                             .then(function (response) {
-                            _this.applyMultiplier(target.aggregators, ['longSum', 'doubleSum'], response);
-                            _this.applyMultiplier(target.postAggregators, ['fieldAccess', 'arithmetic'], response);
+                            _this.applyMultiplier(target.aggregators, ['longSum', 'doubleSum'], response, options.panelId);
+                            _this.applyMultiplier(target.postAggregators, ['fieldAccess', 'arithmetic'], response, options.panelId);
                             return response;
                         });
                     });
@@ -86,18 +86,19 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         return { data: lodash_1.default.flatten(results) };
                     });
                 };
-                DruidDatasource.prototype.applyMultiplier = function (aggregator, types, data) {
+                DruidDatasource.prototype.applyMultiplier = function (aggregator, types, data, panelId) {
+                    var _this = this;
                     if (!aggregator)
                         return;
                     aggregator.filter(function (a) { return lodash_1.default.includes(types, a.type) && a.extMultiplier; })
                         .forEach(function (a) {
                         data.filter(function (r) { return r.target === a.name; })
                             .flatMap(function (r) { return r.datapoints; })
-                            .forEach(function (dp) { return dp[0] = dp[0] * a.extMultiplier; });
+                            .forEach(function (dp) { return dp[0] = dp[0] * _this.replaceTemplateValuesNum(a.extMultiplier, panelId); });
                         data.filter(function (set) { return set.columns && set.rows && set.columns.find(function (v) { return v.text === a.name; }); })
                             .forEach(function (set) {
                             var i = set.columns.findIndex(function (v) { return v.text === a.name; });
-                            set.rows.forEach(function (r) { return r[i] *= a.extMultiplier; });
+                            set.rows.forEach(function (r) { return r[i] *= _this.replaceTemplateValuesNum(a.extMultiplier, panelId); });
                         });
                     });
                 };
@@ -121,11 +122,9 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         selectThreshold = 5;
                     }
                     if (target.queryType === 'topN') {
-                        var threshold = (typeof target.limit === 'string')
-                            ? this.templateSrv.replace(target.limit, this.scopedVars[panelId])
-                            : target.limit;
-                        var metric_1 = target.druidMetric;
-                        var metricToShow_1 = target.druidMetricToShow;
+                        var threshold = this.replaceTemplateValuesNum(target.limit, panelId);
+                        var metric_1 = this.templateSrv.replace(target.druidMetric, this.scopedVars[panelId]);
+                        var metricToShow_1 = this.templateSrv.replace(target.druidMetricToShow, this.scopedVars[panelId]);
                         var dimension_1 = this.templateSrv.replace(target.dimension, this.scopedVars[panelId]);
                         promise = this.topNQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, threshold, metric_1, dimension_1, panelId)
                             .then(function (response) {
@@ -133,10 +132,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         });
                     }
                     else if (target.queryType === 'groupBy') {
-                        var limit = (typeof target.limit === 'string')
-                            ? this.templateSrv.replace(target.limit, this.scopedVars[panelId])
-                            : target.limit;
-                        limitSpec = this.getLimitSpec(limit, target.orderBy, panelId);
+                        limitSpec = this.getLimitSpec(this.replaceTemplateValuesNum(target.limit, panelId), target.orderBy, panelId);
                         promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
                             .then(function (response) {
                             return target.tableType === 'table'
@@ -570,6 +566,11 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         });
                         return lodash_1.default.assign(lodash_1.default.clone(obj, true), lodash_1.default.zipObject(attrList, substitutedVals));
                     }
+                };
+                DruidDatasource.prototype.replaceTemplateValuesNum = function (val, panelId) {
+                    return (typeof val === 'string')
+                        ? this.templateSrv.replace(val, this.scopedVars[panelId])
+                        : val;
                 };
                 return DruidDatasource;
             }());

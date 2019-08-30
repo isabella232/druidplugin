@@ -81,8 +81,8 @@ export default class DruidDatasource {
       }
       return this.doQuery(roundedFrom, to, granularity, target, options.panelId)
         .then(response => {
-          this.applyMultiplier(target.aggregators, ['longSum', 'doubleSum'], response);
-          this.applyMultiplier(target.postAggregators, ['fieldAccess', 'arithmetic'], response);
+          this.applyMultiplier(target.aggregators, ['longSum', 'doubleSum'], response, options.panelId);
+          this.applyMultiplier(target.postAggregators, ['fieldAccess', 'arithmetic'], response, options.panelId);
           return response;
         });
     });
@@ -92,19 +92,19 @@ export default class DruidDatasource {
     });
   }
 
-  applyMultiplier(aggregator, types, data) {
+  applyMultiplier(aggregator, types, data, panelId) {
     if (!aggregator) return;
     aggregator.filter(a => _.includes(types, a.type) && a.extMultiplier)
       .forEach(a => {
         // transform timeseries
         data.filter(r => r.target === a.name)
           .flatMap(r => r.datapoints)
-          .forEach(dp => dp[0] = dp[0] * a.extMultiplier);
+          .forEach(dp => dp[0] = dp[0] * this.replaceTemplateValuesNum(a.extMultiplier, panelId));
         // transform tables
         data.filter(set => set.columns && set.rows && set.columns.find(v => v.text === a.name))
           .forEach(set => {
               let i = set.columns.findIndex(v => v.text === a.name);
-              set.rows.forEach(r => r[i] *= a.extMultiplier);
+              set.rows.forEach(r => r[i] *= this.replaceTemplateValuesNum(a.extMultiplier, panelId));
           });
     });
   }
@@ -130,11 +130,9 @@ export default class DruidDatasource {
     }
 
     if (target.queryType === 'topN') {
-      let threshold = (typeof target.limit === 'string')
-          ? this.templateSrv.replace(target.limit, this.scopedVars[panelId])
-          : target.limit;
-      let metric = target.druidMetric;
-      let metricToShow = target.druidMetricToShow;
+      let threshold = this.replaceTemplateValuesNum(target.limit, panelId);
+      let metric = this.templateSrv.replace(target.druidMetric, this.scopedVars[panelId]);
+      let metricToShow = this.templateSrv.replace(target.druidMetricToShow, this.scopedVars[panelId]);
       let dimension = this.templateSrv.replace(target.dimension, this.scopedVars[panelId]);
       promise = this.topNQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, threshold, metric, dimension, panelId)
         .then(response => {
@@ -142,10 +140,7 @@ export default class DruidDatasource {
         });
     }
     else if (target.queryType === 'groupBy') {
-      let limit = (typeof target.limit === 'string')
-          ? this.templateSrv.replace(target.limit, this.scopedVars[panelId])
-          : target.limit;
-      limitSpec = this.getLimitSpec(limit, target.orderBy, panelId);
+      limitSpec = this.getLimitSpec(this.replaceTemplateValuesNum(target.limit, panelId), target.orderBy, panelId);
       promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
         .then(response => {
           return target.tableType === 'table'
@@ -712,5 +707,11 @@ export default class DruidDatasource {
       });
       return _.assign(_.clone(obj, true), _.zipObject(attrList, substitutedVals));
     }
+  }
+
+  replaceTemplateValuesNum(val, panelId) {
+    return (typeof val === 'string')
+        ? this.templateSrv.replace(val, this.scopedVars[panelId])
+        : val;
   }
 }
