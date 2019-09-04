@@ -133,7 +133,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         });
                     }
                     else if (target.queryType === 'groupBy') {
-                        limitSpec = this.getLimitSpec(this.replaceTemplateValuesNum(target.limit, panelId), this.replaceTemplateValuesNum(target.orderBy, panelId), panelId);
+                        limitSpec = this.getLimitSpec(this.replaceTemplateValuesNum(target.limit, panelId), this.replaceTemplateValuesNum(target.orderBy, panelId).split(','), panelId);
                         promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
                             .then(function (response) {
                             return target.tableType === 'table'
@@ -247,21 +247,19 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                 };
                 ;
                 DruidDatasource.prototype.getLimitSpec = function (limitNum, orderBy, panelId) {
-                    var _this = this;
                     return {
                         "type": "default",
                         "limit": limitNum,
                         "columns": !orderBy ? null : orderBy.map(function (col) {
-                            var columnName = _this.templateSrv.replace(col, _this.scopedVars[panelId]);
-                            if (columnName.startsWith('!')) {
+                            if (col.startsWith('!')) {
                                 return {
-                                    "dimension": columnName.substr(1),
+                                    "dimension": col.substr(1),
                                     "direction": "ASCENDING"
                                 };
                             }
                             else {
                                 return {
-                                    "dimension": columnName,
+                                    "dimension": col,
                                     "direction": "DESCENDING"
                                 };
                             }

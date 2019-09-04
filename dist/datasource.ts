@@ -144,7 +144,7 @@ export default class DruidDatasource {
     else if (target.queryType === 'groupBy') {
       limitSpec = this.getLimitSpec(
           this.replaceTemplateValuesNum(target.limit, panelId),
-          this.replaceTemplateValuesNum(target.orderBy, panelId),
+          this.replaceTemplateValuesNum(target.orderBy, panelId).split(','),
           panelId);
       promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
         .then(response => {
@@ -296,15 +296,14 @@ export default class DruidDatasource {
       "type": "default",
       "limit": limitNum,
       "columns": !orderBy ? null : orderBy.map(col => {
-        let columnName = this.templateSrv.replace(col, this.scopedVars[panelId]);
-        if (columnName.startsWith('!')) {
+        if (col.startsWith('!')) {
           return {
-            "dimension": columnName.substr(1),
+            "dimension": col.substr(1),
             "direction": "ASCENDING"
           };
         } else {
           return {
-            "dimension": columnName,
+            "dimension": col,
             "direction": "DESCENDING"
           };
         }
