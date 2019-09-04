@@ -144,7 +144,7 @@ export default class DruidDatasource {
     else if (target.queryType === 'groupBy') {
       limitSpec = this.getLimitSpec(
           this.replaceTemplateValuesNum(target.limit, panelId),
-          this.stringToArray(this.replaceTemplateValuesNum(target.orderBy, panelId)),
+          this.stringToArray(this.templateSrv.replace(target.orderBy, panelId)),
           panelId);
       promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
         .then(response => {
