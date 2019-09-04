@@ -133,7 +133,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         });
                     }
                     else if (target.queryType === 'groupBy') {
-                        limitSpec = this.getLimitSpec(this.replaceTemplateValuesNum(target.limit, panelId), this.replaceTemplateValuesNum(target.orderBy, panelId).split(','), panelId);
+                        limitSpec = this.getLimitSpec(this.replaceTemplateValuesNum(target.limit, panelId), this.stringToArray(this.replaceTemplateValuesNum(target.orderBy, panelId)), panelId);
                         promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
                             .then(function (response) {
                             return target.tableType === 'table'
@@ -570,6 +570,13 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     return (typeof val === 'string')
                         ? this.templateSrv.replace(val, this.scopedVars[panelId])
                         : val;
+                };
+                DruidDatasource.prototype.stringToArray = function (val) {
+                    if (!val)
+                        return [];
+                    if (typeof val === 'string')
+                        return val.split(',');
+                    return val;
                 };
                 return DruidDatasource;
             }());
