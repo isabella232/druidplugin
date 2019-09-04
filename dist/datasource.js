@@ -133,7 +133,10 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         });
                     }
                     else if (target.queryType === 'groupBy') {
-                        limitSpec = this.getLimitSpec(this.replaceTemplateValuesNum(target.limit, panelId), this.stringToArray(this.templateSrv.replace(target.orderBy, this.scopedVars[panelId])), panelId);
+                        var order = (typeof target.orderBy === 'string')
+                            ? this.templateSrv.replace(target.orderBy, this.scopedVars[panelId]).split(',')
+                            : target.orderBy;
+                        limitSpec = this.getLimitSpec(this.replaceTemplateValuesNum(target.limit, panelId), order, panelId);
                         promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
                             .then(function (response) {
                             return target.tableType === 'table'
@@ -247,19 +250,21 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                 };
                 ;
                 DruidDatasource.prototype.getLimitSpec = function (limitNum, orderBy, panelId) {
+                    var _this = this;
                     return {
                         "type": "default",
                         "limit": limitNum,
                         "columns": !orderBy ? null : orderBy.map(function (col) {
-                            if (col.startsWith('!')) {
+                            var columnName = _this.templateSrv.replace(col, _this.scopedVars[panelId]);
+                            if (columnName.startsWith('!')) {
                                 return {
-                                    "dimension": col.substr(1),
+                                    "dimension": columnName.substr(1),
                                     "direction": "ASCENDING"
                                 };
                             }
                             else {
                                 return {
-                                    "dimension": col,
+                                    "dimension": columnName,
                                     "direction": "DESCENDING"
                                 };
                             }
@@ -570,13 +575,6 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     return (typeof val === 'string')
                         ? this.templateSrv.replace(val, this.scopedVars[panelId])
                         : val;
-                };
-                DruidDatasource.prototype.stringToArray = function (val) {
-                    if (!val)
-                        return [];
-                    if (typeof val === 'string')
-                        return val.split(',');
-                    return val;
                 };
                 return DruidDatasource;
             }());

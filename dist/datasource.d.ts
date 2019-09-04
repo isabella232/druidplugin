@@ -55,5 +55,4 @@ export default class DruidDatasource {
     roundUpStartTime(from: any, granularity: any): any;
     replaceTemplateValues(obj: any, attrList: any, panelId: any): any;
     replaceTemplateValuesNum(val: any, panelId: any): any;
-    stringToArray(val: any): any;
 }

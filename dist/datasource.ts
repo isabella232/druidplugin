@@ -142,10 +142,10 @@ export default class DruidDatasource {
         });
     }
     else if (target.queryType === 'groupBy') {
-      limitSpec = this.getLimitSpec(
-          this.replaceTemplateValuesNum(target.limit, panelId),
-          this.stringToArray(this.templateSrv.replace(target.orderBy, this.scopedVars[panelId])),
-          panelId);
+      let order = (typeof target.orderBy === 'string')
+          ? this.templateSrv.replace(target.orderBy, this.scopedVars[panelId]).split(',')
+          : target.orderBy;
+      limitSpec = this.getLimitSpec(this.replaceTemplateValuesNum(target.limit, panelId), order, panelId);
       promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
         .then(response => {
           return target.tableType === 'table'
@@ -296,14 +296,15 @@ export default class DruidDatasource {
       "type": "default",
       "limit": limitNum,
       "columns": !orderBy ? null : orderBy.map(col => {
-        if (col.startsWith('!')) {
+        let columnName = this.templateSrv.replace(col, this.scopedVars[panelId]);
+        if (columnName.startsWith('!')) {
           return {
-            "dimension": col.substr(1),
+            "dimension": columnName.substr(1),
             "direction": "ASCENDING"
           };
         } else {
           return {
-            "dimension": col,
+            "dimension": columnName,
             "direction": "DESCENDING"
           };
         }
@@ -719,9 +720,4 @@ export default class DruidDatasource {
         : val;
   }
 
-  stringToArray(val) {
-    if (!val) return [];
-    if (typeof val === 'string') return val.split(',');
-    return val;
-  }
 }
