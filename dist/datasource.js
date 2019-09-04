@@ -133,7 +133,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         });
                     }
                     else if (target.queryType === 'groupBy') {
-                        limitSpec = this.getLimitSpec(this.replaceTemplateValuesNum(target.limit, panelId), this.stringToArray(this.templateSrv.replace(target.orderBy, panelId)), panelId);
+                        limitSpec = this.getLimitSpec(this.replaceTemplateValuesNum(target.limit, panelId), this.stringToArray(this.templateSrv.replace(target.orderBy, this.scopedVars[panelId])), panelId);
                         promise = this.groupByQuery(datasource, intervals, granularity, filters, aggregators, postAggregators, groupBy, limitSpec, panelId)
                             .then(function (response) {
                             return target.tableType === 'table'
