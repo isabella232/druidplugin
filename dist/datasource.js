@@ -274,6 +274,8 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                 DruidDatasource.prototype.metricFindQuery = function (query) {
                     var range = angular_1.default.element('grafana-app').injector().get('timeSrv').timeRangeForUrl(), from = this.dateToMoment(range.from, false), to = this.dateToMoment(range.to, true), intervals = this.getQueryIntervals(from, to);
                     var q = JSON.parse(this.templateSrv.replace(query));
+                    if (lodash_1.default.isArray(q.filters))
+                        q.filter = this.buildFilterTree(q.filters, undefined);
                     if (q.filter.fields)
                         q.filter.fields = q.filter.fields.filter(function (f) { return !f.value || f.value !== 'skipFilter'; });
                     q.intervals = intervals;
