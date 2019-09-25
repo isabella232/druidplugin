@@ -276,7 +276,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     var q = JSON.parse(this.templateSrv.replace(query));
                     if (lodash_1.default.isArray(q.filters))
                         q.filter = this.buildFilterTree(q.filters.filter(function (f) { return !f.value || f.value !== 'skipFilter'; }), undefined);
-                    if (q.filter.fields)
+                    if (q.filter && q.filter.fields)
                         q.filter.fields = q.filter.fields.filter(function (f) { return !f.value || f.value !== 'skipFilter'; });
                     q.intervals = intervals;
                     return this.druidQuery(q)

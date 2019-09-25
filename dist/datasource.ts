@@ -320,7 +320,7 @@ export default class DruidDatasource {
 
     var q = JSON.parse(this.templateSrv.replace(query));
     if (_.isArray(q.filters)) q.filter = this.buildFilterTree(q.filters.filter(f => !f.value || f.value !== 'skipFilter'), undefined);
-    if (q.filter.fields) q.filter.fields = q.filter.fields.filter(f => !f.value || f.value !== 'skipFilter');
+    if (q.filter && q.filter.fields) q.filter.fields = q.filter.fields.filter(f => !f.value || f.value !== 'skipFilter');
     q.intervals = intervals;
 
     return this.druidQuery(q)
