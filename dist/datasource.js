@@ -271,18 +271,29 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                         })
                     };
                 };
+                DruidDatasource.prototype.humanizeVariable = function (varName, id) {
+                    if (!varName || !this.templateSrv.index[varName])
+                        return id;
+                    return (this.templateSrv.index[varName].options.find(function (e) { return e.value === id; }) || {}).text || id;
+                };
                 DruidDatasource.prototype.metricFindQuery = function (query) {
-                    var range = angular_1.default.element('grafana-app').injector().get('timeSrv').timeRangeForUrl(), from = this.dateToMoment(range.from, false), to = this.dateToMoment(range.to, true), intervals = this.getQueryIntervals(from, to);
+                    var _this = this;
+                    var range = angular_1.default.element('grafana-app').injector().get('timeSrv').timeRangeForUrl(), from = this.dateToMoment(range.from, false), to = this.dateToMoment(range.to, true), intervals = this.getQueryIntervals(from, to), varName = '';
                     var q = JSON.parse(this.templateSrv.replace(query));
                     if (lodash_1.default.isArray(q.filters))
                         q.filter = this.buildFilterTree(q.filters.filter(function (f) { return !f.value || f.value !== 'skipFilter'; }), undefined);
                     if (q.filter && q.filter.fields)
                         q.filter.fields = q.filter.fields.filter(function (f) { return !f.value || f.value !== 'skipFilter'; });
                     q.intervals = intervals;
+                    if (q.ext && q.ext.mapValues && q.ext.mapValues.varName) {
+                        varName = q.ext.mapValues.varName;
+                        if (q.ext.mapValues.varMap && q.ext.mapValues.varMap[varName])
+                            varName = q.ext.mapValues.varMap[varName];
+                    }
                     return this.druidQuery(q)
                         .then(function (response) {
                         return lodash_1.default.map(response.data[0].result, function (e) {
-                            return { "text": e[q.dimension] };
+                            return { "text": _this.humanizeVariable(varName, e[q.dimension]), "value": e[q.dimension] };
                         });
                     });
                 };

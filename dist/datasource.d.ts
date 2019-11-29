@@ -34,6 +34,7 @@ export default class DruidDatasource {
         "limit": any;
         "columns": any;
     };
+    humanizeVariable(varName: any, id: any): any;
     metricFindQuery(query: any): any;
     testDatasource(): any;
     getDataSources(): any;

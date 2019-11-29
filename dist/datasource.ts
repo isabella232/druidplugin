@@ -312,21 +312,32 @@ export default class DruidDatasource {
     };
   }
 
+  humanizeVariable(varName, id) {
+    if (!varName || !this.templateSrv.index[varName]) return id;
+    return (this.templateSrv.index[varName].options.find(e => e.value === id) || {}).text || id;
+  }
+
   metricFindQuery(query) {
     var range = angular.element('grafana-app').injector().get('timeSrv').timeRangeForUrl(),
       from = this.dateToMoment(range.from, false),
       to = this.dateToMoment(range.to, true),
-      intervals = this.getQueryIntervals(from, to);
+      intervals = this.getQueryIntervals(from, to),
+      varName = '';
 
     var q = JSON.parse(this.templateSrv.replace(query));
     if (_.isArray(q.filters)) q.filter = this.buildFilterTree(q.filters.filter(f => !f.value || f.value !== 'skipFilter'), undefined);
     if (q.filter && q.filter.fields) q.filter.fields = q.filter.fields.filter(f => !f.value || f.value !== 'skipFilter');
     q.intervals = intervals;
 
+    if (q.ext && q.ext.mapValues && q.ext.mapValues.varName) {
+      varName = q.ext.mapValues.varName;
+      if (q.ext.mapValues.varMap && q.ext.mapValues.varMap[varName]) varName = q.ext.mapValues.varMap[varName];
+    }
+
     return this.druidQuery(q)
       .then(response => {
         return _.map(response.data[0].result, (e) => {
-          return { "text": e[q.dimension] };
+          return { "text": this.humanizeVariable(varName, e[q.dimension]), "value": e[q.dimension] };
         });
       });
   }
