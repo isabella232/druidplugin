@@ -108,17 +108,17 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     var datasource = target.druidDS;
                     var filters = target.filters;
                     var aggregators = this.replaceTemplateValues(target.aggregators, ['name', 'fieldName', 'fields'], panelId).map(this.splitArrayFields);
-                    aggregators = aggregators.map(function (a) { return !a.extFilter ? a : {
-                        type: 'filtered',
-                        filter: { type: 'selector', dimension: a.extFilter.split('=')[0], value: a.extFilter.split('=')[1] },
-                        aggregator: a
-                    }; });
                     var postAggregators = target.postAggregators
                         ? this.replaceTemplateValues(target.postAggregators, ['name', 'fieldName', 'fields'], panelId).map(this.splitArrayFields)
                         : [];
                     var groupBy = lodash_1.default.map(target.groupBy, function (e) { return _this.templateSrv.replace(e, _this.scopedVars[panelId]); });
                     var limitSpec = null;
                     var metricNames = this.getMetricNames(aggregators, postAggregators);
+                    aggregators = aggregators.map(function (a) { return !a.extFilter ? a : {
+                        type: 'filtered',
+                        filter: { type: 'selector', dimension: a.extFilter.split('=')[0], value: a.extFilter.split('=')[1] },
+                        aggregator: a
+                    }; });
                     var intervals = this.getQueryIntervals(from, to);
                     var promise = null;
                     var selectMetrics = target.selectMetrics;
