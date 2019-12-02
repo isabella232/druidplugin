@@ -108,6 +108,11 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     var datasource = target.druidDS;
                     var filters = target.filters;
                     var aggregators = this.replaceTemplateValues(target.aggregators, ['name', 'fieldName', 'fields'], panelId).map(this.splitArrayFields);
+                    aggregators = aggregators.map(function (a) { return !a.extFilter ? a : {
+                        type: 'filtered',
+                        filter: { type: 'selector', dimension: a.extFilter.split('=')[0], value: a.extFilter.split('=')[1] },
+                        aggregator: a
+                    }; });
                     var postAggregators = target.postAggregators
                         ? this.replaceTemplateValues(target.postAggregators, ['name', 'fieldName', 'fields'], panelId).map(this.splitArrayFields)
                         : [];
