@@ -683,9 +683,8 @@ export default class DruidDatasource {
   }
 
   dateToMoment(date, roundUp) {
-    if (date === 'now') {
-      return moment();
-    }
+    if (date === 'now') return moment();
+    if (date == parseInt(date)) return moment(parseInt(date));
     date = dateMath.parse(date, roundUp);
     return moment(date.valueOf());
   }

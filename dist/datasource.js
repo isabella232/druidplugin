@@ -546,9 +546,10 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     return lodash_1.default.values(result);
                 };
                 DruidDatasource.prototype.dateToMoment = function (date, roundUp) {
-                    if (date === 'now') {
+                    if (date === 'now')
                         return moment_1.default();
-                    }
+                    if (date == parseInt(date))
+                        return moment_1.default(parseInt(date));
                     date = dateMath.parse(date, roundUp);
                     return moment_1.default(date.valueOf());
                 };
