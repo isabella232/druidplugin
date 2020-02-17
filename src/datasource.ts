@@ -118,7 +118,7 @@ export default class DruidDatasource {
     let postAggregators = target.postAggregators
         ? this.replaceTemplateValues(target.postAggregators, ['name', 'fieldName', 'fields'], panelId).map(this.splitArrayFields)
         : [];
-    let groupBy = _.map(target.groupBy, (e) => { return this.templateSrv.replace(e, this.scopedVars[panelId]) });
+    let groupBy = _.flatMap(target.groupBy, (e) => { return this.templateSrv.replace(e, this.scopedVars[panelId]).split(',') });
     let limitSpec = null;
     let metricNames = this.getMetricNames(aggregators, postAggregators);
     aggregators = aggregators.map(a => !a.extFilter ? a : {

@@ -111,7 +111,7 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     var postAggregators = target.postAggregators
                         ? this.replaceTemplateValues(target.postAggregators, ['name', 'fieldName', 'fields'], panelId).map(this.splitArrayFields)
                         : [];
-                    var groupBy = lodash_1.default.map(target.groupBy, function (e) { return _this.templateSrv.replace(e, _this.scopedVars[panelId]); });
+                    var groupBy = lodash_1.default.flatMap(target.groupBy, function (e) { return _this.templateSrv.replace(e, _this.scopedVars[panelId]).split(','); });
                     var limitSpec = null;
                     var metricNames = this.getMetricNames(aggregators, postAggregators);
                     aggregators = aggregators.map(function (a) { return !a.extFilter ? a : {
