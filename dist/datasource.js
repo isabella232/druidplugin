@@ -277,9 +277,15 @@ System.register(["lodash", "moment", "app/core/utils/datemath", "angular"], func
                     };
                 };
                 DruidDatasource.prototype.humanizeVariable = function (varName, id) {
-                    if (!varName || !this.templateSrv.index[varName])
+                    if (!varName)
                         return id;
-                    return (this.templateSrv.index[varName].options.find(function (e) { return e.value === id; }) || {}).text || id;
+                    var templateVar = this.templateSrv.index[varName] || this.templateSrv.getVariables().find(function (e) { return e.name == varName; });
+                    if (!templateVar)
+                        return id;
+                    var templateOpt = templateVar.options.find(function (e) { return e.value.split(",").includes(id); });
+                    if (!templateOpt)
+                        return id;
+                    return templateOpt.text;
                 };
                 DruidDatasource.prototype.metricFindQuery = function (query) {
                     var _this = this;

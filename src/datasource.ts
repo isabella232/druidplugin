@@ -318,8 +318,15 @@ export default class DruidDatasource {
   }
 
   humanizeVariable(varName, id) {
-    if (!varName || !this.templateSrv.index[varName]) return id;
-    return (this.templateSrv.index[varName].options.find(e => e.value === id) || {}).text || id;
+    if (!varName) return id;
+
+    var templateVar = this.templateSrv.index[varName] || this.templateSrv.getVariables().find(e => e.name == varName);
+    if (!templateVar) return id;
+
+    var templateOpt = templateVar.options.find(e => e.value.split(",").includes(id));
+    if (!templateOpt) return id;
+
+    return templateOpt.text;
   }
 
   metricFindQuery(query) {
